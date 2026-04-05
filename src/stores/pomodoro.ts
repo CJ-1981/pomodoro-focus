@@ -229,7 +229,31 @@ export const usePomodoroStore = create<PomodoroState>()(
     }),
     {
       name: 'pomodoro-storage',
+      onRehydrateStorage: (state) => {
+        return (hydratedState, error) => {
+          if (error || !hydratedState) return;
+
+          // Check if timer was running when app closed
+          if (hydratedState.timerState === 'running' && hydratedState.endTime) {
+            const now = Date.now();
+            const remaining = hydratedState.endTime - now;
+
+            if (remaining <= 0) {
+              // Timer finished while app was closed
+              hydratedState.remainingMs = 0;
+              hydratedState.timerComplete();
+            } else {
+              hydratedState.remainingMs = remaining;
+            }
+          }
+        };
+      },
       partialize: (state) => ({
+        mode: state.mode,
+        timerState: state.timerState,
+        endTime: state.endTime,
+        remainingMs: state.remainingMs,
+        totalTime: state.totalTime,
         completedWorkSessions: state.completedWorkSessions,
         totalCompletedToday: state.totalCompletedToday,
         settings: state.settings,
