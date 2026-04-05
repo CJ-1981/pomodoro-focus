@@ -137,15 +137,15 @@ export function PomodoroApp() {
   return (
     <div className="fixed inset-0 bg-background text-foreground flex flex-col">
       {/* Header + Mode Tabs */}
-      <div className="flex-shrink-0">
-        <header className="flex items-center justify-between px-5 pt-safe pb-1">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-pomodoro-work flex items-center justify-center">
-              <span className="text-sm">🍅</span>
+      <div className="flex-shrink-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50 border-b border-border/5">
+        <header className="flex items-center justify-between px-6 pt-[calc(env(safe-area-inset-top)+1rem)] pb-3">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-pomodoro-work flex items-center justify-center shadow-sm">
+              <span className="text-base">🍅</span>
             </div>
-            <h1 className="text-lg font-semibold tracking-tight">Pomodoro</h1>
+            <h1 className="text-xl font-bold tracking-tight">Pomodoro</h1>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             <ThemeToggle />
             <SettingsSheet />
           </div>
@@ -194,7 +194,7 @@ export function PomodoroApp() {
       </main>
 
       {/* Footer */}
-      <footer className="px-5 pb-safe pt-2 flex-shrink-0">
+      <footer className="px-5 pb-[calc(env(safe-area-inset-bottom)+1.25rem)] pt-2 flex-shrink-0">
         <NotificationBanner />
       </footer>
     </div>

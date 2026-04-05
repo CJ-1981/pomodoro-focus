@@ -112,7 +112,7 @@ export function SettingsSheet() {
         <Button
           variant="ghost"
           size="icon"
-          className="h-10 w-10 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent"
+          className="h-11 w-11 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent"
         >
           <Settings className="h-5 w-5" />
         </Button>
