@@ -39,6 +39,13 @@ export interface PomodoroSettings {
   notificationsEnabled: boolean;
 }
 
+interface ModeState {
+  timerState: TimerState;
+  endTime: number | null;
+  remainingMs: number;
+  totalTime: number;
+}
+
 interface PomodoroState {
   // Timer state
   mode: TimerMode;
@@ -46,6 +53,10 @@ interface PomodoroState {
   endTime: number | null; // Unix timestamp when timer should end
   remainingMs: number; // Calculated remaining time
   totalTime: number; // Total duration for current timer in ms
+  lastCompletedMode: TimerMode | null; // Track which mode just finished for notifications
+
+  // Mode-specific states to allow switching without resetting
+  modeStates: Record<TimerMode, ModeState>;
 
   // Session tracking
   completedWorkSessions: number;
@@ -93,6 +104,29 @@ function getDurationForMode(mode: TimerMode, settings: PomodoroSettings): number
   }
 }
 
+function createInitialModeStates(settings: PomodoroSettings): Record<TimerMode, ModeState> {
+  return {
+    work: {
+      timerState: 'idle',
+      endTime: null,
+      remainingMs: settings.workDuration * 60 * 1000,
+      totalTime: settings.workDuration * 60 * 1000,
+    },
+    shortBreak: {
+      timerState: 'idle',
+      endTime: null,
+      remainingMs: settings.shortBreakDuration * 60 * 1000,
+      totalTime: settings.shortBreakDuration * 60 * 1000,
+    },
+    longBreak: {
+      timerState: 'idle',
+      endTime: null,
+      remainingMs: settings.longBreakDuration * 60 * 1000,
+      totalTime: settings.longBreakDuration * 60 * 1000,
+    },
+  };
+}
+
 export const usePomodoroStore = create<PomodoroState>()(
   persist(
     (set, get) => ({
@@ -101,6 +135,8 @@ export const usePomodoroStore = create<PomodoroState>()(
       endTime: null,
       remainingMs: DEFAULT_SETTINGS.workDuration * 60 * 1000,
       totalTime: DEFAULT_SETTINGS.workDuration * 60 * 1000,
+      lastCompletedMode: null,
+      modeStates: createInitialModeStates(DEFAULT_SETTINGS),
       completedWorkSessions: 0,
       totalCompletedToday: 0,
       settings: DEFAULT_SETTINGS,
@@ -120,7 +156,6 @@ export const usePomodoroStore = create<PomodoroState>()(
       },
 
       pauseTimer: () => {
-        const { remainingMs } = get();
         set({ timerState: 'paused', endTime: null });
       },
 
@@ -131,50 +166,92 @@ export const usePomodoroStore = create<PomodoroState>()(
       },
 
       resetTimer: () => {
-        const { mode, settings } = get();
+        const { mode, settings, modeStates } = get();
         const duration = getDurationForMode(mode, settings);
-        set({
-          timerState: 'idle',
+        const newState = {
+          timerState: 'idle' as TimerState,
           endTime: null,
           remainingMs: duration,
           totalTime: duration,
+        };
+        set({
+          ...newState,
+          modeStates: {
+            ...modeStates,
+            [mode]: newState,
+          },
         });
       },
 
-      switchMode: (mode: TimerMode) => {
-        const { settings } = get();
-        const duration = getDurationForMode(mode, settings);
+      switchMode: (newMode: TimerMode) => {
+        const { mode, modeStates, timerState, endTime, remainingMs, totalTime } = get();
+        
+        // If switching to the same mode, do nothing (prevents reset)
+        if (newMode === mode) return;
+
+        // Save current state
+        const updatedModeStates = {
+          ...modeStates,
+          [mode]: { timerState, endTime, remainingMs, totalTime },
+        };
+
+        // Load next state
+        const nextState = updatedModeStates[newMode];
+
         set({
-          mode,
-          timerState: 'idle',
-          endTime: null,
-          remainingMs: duration,
-          totalTime: duration,
+          mode: newMode,
+          modeStates: updatedModeStates,
+          timerState: nextState.timerState,
+          endTime: nextState.endTime,
+          remainingMs: nextState.remainingMs,
+          totalTime: nextState.totalTime,
         });
       },
 
       timerComplete: () => {
-        const { mode, completedWorkSessions, settings } = get();
+        const { mode, completedWorkSessions, settings, modeStates } = get();
+        let nextMode: TimerMode = mode;
+        let newCompletedWorkSessions = completedWorkSessions;
+        let newTotalCompletedToday = get().totalCompletedToday;
 
         if (mode === 'work') {
-          const newCount = completedWorkSessions + 1;
-          const nextMode: TimerMode =
-            newCount % settings.longBreakInterval === 0 ? 'longBreak' : 'shortBreak';
-
-          set({
-            timerState: 'completed',
-            completedWorkSessions: newCount,
-            totalCompletedToday: get().totalCompletedToday + 1,
-            mode: nextMode,
-            endTime: null,
-          });
+          newCompletedWorkSessions = completedWorkSessions + 1;
+          newTotalCompletedToday += 1;
+          nextMode = newCompletedWorkSessions % settings.longBreakInterval === 0 ? 'longBreak' : 'shortBreak';
         } else {
-          set({
-            timerState: 'completed',
-            mode: 'work',
-            endTime: null,
-          });
+          nextMode = 'work';
         }
+
+        // Reset the mode that just completed to idle/default
+        const completedModeDuration = getDurationForMode(mode, settings);
+        const resetCompletedMode: ModeState = {
+          timerState: 'completed',
+          endTime: null,
+          remainingMs: 0,
+          totalTime: completedModeDuration,
+        };
+
+        // Also prepare the next mode if it was idle
+        const nextModeDuration = getDurationForMode(nextMode, settings);
+        const nextState = modeStates[nextMode];
+        
+        // Save states
+        const updatedModeStates = {
+          ...modeStates,
+          [mode]: resetCompletedMode,
+        };
+
+        set({
+          timerState: 'completed',
+          completedWorkSessions: newCompletedWorkSessions,
+          totalCompletedToday: newTotalCompletedToday,
+          mode: nextMode,
+          lastCompletedMode: mode,
+          endTime: null,
+          remainingMs: nextState.timerState === 'idle' ? nextModeDuration : nextState.remainingMs,
+          totalTime: nextState.timerState === 'idle' ? nextModeDuration : nextState.totalTime,
+          modeStates: updatedModeStates,
+        });
       },
 
       updateRemaining: () => {
@@ -191,15 +268,33 @@ export const usePomodoroStore = create<PomodoroState>()(
       },
 
       updateSettings: (newSettings) => {
-        const { mode, timerState, settings } = get();
+        const { mode, timerState, settings, modeStates } = get();
         const merged = { ...settings, ...newSettings };
+        
+        // Update all mode durations in modeStates if they are currently idle
+        const updatedModeStates = { ...modeStates };
+        (Object.keys(updatedModeStates) as TimerMode[]).forEach((m) => {
+          if (updatedModeStates[m].timerState === 'idle') {
+            const duration = getDurationForMode(m, merged);
+            updatedModeStates[m] = {
+              ...updatedModeStates[m],
+              remainingMs: duration,
+              totalTime: duration,
+            };
+          }
+        });
 
-        // If timer is idle, update the remaining time
+        // If current timer is idle, update top-level remaining time too
         if (timerState === 'idle') {
           const duration = getDurationForMode(mode, merged);
-          set({ settings: merged, remainingMs: duration, totalTime: duration });
+          set({ 
+            settings: merged, 
+            remainingMs: duration, 
+            totalTime: duration,
+            modeStates: updatedModeStates,
+          });
         } else {
-          set({ settings: merged });
+          set({ settings: merged, modeStates: updatedModeStates });
         }
       },
 
@@ -254,6 +349,7 @@ export const usePomodoroStore = create<PomodoroState>()(
         endTime: state.endTime,
         remainingMs: state.remainingMs,
         totalTime: state.totalTime,
+        modeStates: state.modeStates,
         completedWorkSessions: state.completedWorkSessions,
         totalCompletedToday: state.totalCompletedToday,
         settings: state.settings,

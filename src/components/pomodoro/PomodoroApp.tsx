@@ -23,6 +23,7 @@ export function PomodoroApp() {
     timerState,
     settings,
     completedWorkSessions,
+    lastCompletedMode,
     firebaseConfig,
     fcmStatus,
     switchMode,
@@ -58,7 +59,7 @@ export function PomodoroApp() {
   // Watch for timer completion
   useEffect(() => {
     if (timerState === 'completed') {
-      const currentMode = mode;
+      const currentMode = lastCompletedMode || mode;
 
       if (settings.soundEnabled) playAlarmSound();
       if (settings.vibrationEnabled) triggerVibration();
@@ -68,21 +69,21 @@ export function PomodoroApp() {
 
       // Auto-start next session if enabled
       if (
-        (currentMode === 'shortBreak' || currentMode === 'longBreak') &&
+        (mode === 'shortBreak' || mode === 'longBreak') &&
         settings.autoStartBreaks
       ) {
         const timeout = setTimeout(() => {
           startTimer();
         }, 1500);
         return () => clearTimeout(timeout);
-      } else if (currentMode === 'work' && settings.autoStartWork) {
+      } else if (mode === 'work' && settings.autoStartWork) {
         const timeout = setTimeout(() => {
           startTimer();
         }, 1500);
         return () => clearTimeout(timeout);
       }
     }
-  }, [timerState, mode, settings, startTimer]);
+  }, [timerState, mode, lastCompletedMode, settings, startTimer]);
 
   // Track completed sessions
   useEffect(() => {

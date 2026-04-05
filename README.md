@@ -6,7 +6,7 @@ A clean, modern, and highly functional Pomodoro timer designed to help you stay 
 
 ## ✨ Features
 
-- **🎯 Smart Timer:** Seamlessly switch between Focus, Short Break, and Long Break sessions.
+- **🎯 Smart Timer:** Seamlessly switch between Focus, Short Break, and Long Break sessions without losing your timer progress in each mode.
 - **🔄 Session Tracking:** Visual indicators to track your progress towards a long break.
 - **🔔 Real-time Notifications:** Desktop and browser notifications to alert you when a session ends.
 - **🌓 Dark Mode:** Responsive theme toggle for comfortable use day or night.

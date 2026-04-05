@@ -138,3 +138,27 @@ Stage Summary:
 - Touch targets: play/pause 96px, reset/skip 72px, mode tabs 48px min-height
 - iOS Safari horizontal scroll eliminated via position:fixed viewport lock + responsive timer sizing
 - Safe area insets handled with viewport-fit:cover + max() padding utility classes
+
+---
+Task ID: 5
+Agent: Main Agent
+Task: Implement per-mode timer state preservation
+
+Work Log:
+- Modified src/stores/pomodoro.ts:
+    - Added ModeState interface to track timerState, endTime, remainingMs, and totalTime for each mode.
+    - Updated PomodoroState to include modeStates (Record<TimerMode, ModeState>) and lastCompletedMode.
+    - Rewrote switchMode to save the current mode's state before loading the next mode's state, preventing resets when switching tabs.
+    - Updated resetTimer, timerComplete, and updateSettings to correctly handle per-mode states.
+    - Ensured timerComplete sets lastCompletedMode to facilitate accurate notifications.
+- Modified src/components/pomodoro/PomodoroApp.tsx:
+    - Updated the timer completion effect to use lastCompletedMode for notifications, ensuring the correct session type is reported even if the user has switched tabs.
+    - Fixed auto-start logic to use the correct mode reference after session completion.
+- Verified that switching between Focus, Short Break, and Long Break tabs maintains the timer progress for each independently.
+- Verified that clicking the already active tab does not reset the timer.
+
+Stage Summary:
+- 2 files modified: src/stores/pomodoro.ts, src/components/pomodoro/PomodoroApp.tsx
+- Persistent timer state across all three modes (Focus, Short Break, Long Break)
+- Accurate notifications regardless of active tab
+- Auto-start functionality preserved and fixed for the new multi-state architecture
