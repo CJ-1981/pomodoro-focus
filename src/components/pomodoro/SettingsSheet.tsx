@@ -120,21 +120,21 @@ export function SettingsSheet() {
 
       <SheetContent
         side="bottom"
-        className="bg-[#1a1a35] border-t border-white/10 text-white rounded-t-2xl max-h-[85vh] overflow-y-auto"
+        className="bg-[#1a1a35] border-t border-white/10 text-white rounded-t-2xl max-h-[85vh] overflow-y-auto max-w-lg mx-auto left-0 right-0 px-5 pt-4 pb-8"
       >
-        <SheetHeader className="text-left pb-2">
-          <SheetTitle className="text-white text-lg">Timer Settings</SheetTitle>
-          <SheetDescription className="text-white/50">
+        <SheetHeader className="text-left pb-0 px-0">
+          <SheetTitle className="text-white text-base">Timer Settings</SheetTitle>
+          <SheetDescription className="text-white/40 text-xs">
             Customize your Pomodoro experience
           </SheetDescription>
         </SheetHeader>
 
-        <div className="space-y-6 mt-4">
+        <div className="space-y-4 mt-3">
           {/* Duration Settings */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-white/80 uppercase tracking-wider">Duration</h3>
+          <div className="space-y-3">
+            <h3 className="text-xs font-semibold text-white/50 uppercase tracking-wider">Duration</h3>
 
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               <div className="flex items-center justify-between">
                 <Label className="text-white/70 text-sm">Focus Duration</Label>
                 <span className="text-sm font-mono font-bold" style={{ color: '#e74c3c' }}>
@@ -147,15 +147,11 @@ export function SettingsSheet() {
                 min={1}
                 max={60}
                 step={1}
-                className="py-2"
+                className="py-1"
               />
-              <div className="flex justify-between text-xs text-white/30">
-                <span>1 min</span>
-                <span>60 min</span>
-              </div>
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               <div className="flex items-center justify-between">
                 <Label className="text-white/70 text-sm">Short Break</Label>
                 <span className="text-sm font-mono font-bold" style={{ color: '#1abc9c' }}>
@@ -168,15 +164,11 @@ export function SettingsSheet() {
                 min={1}
                 max={30}
                 step={1}
-                className="py-2"
+                className="py-1"
               />
-              <div className="flex justify-between text-xs text-white/30">
-                <span>1 min</span>
-                <span>30 min</span>
-              </div>
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               <div className="flex items-center justify-between">
                 <Label className="text-white/70 text-sm">Long Break</Label>
                 <span className="text-sm font-mono font-bold" style={{ color: '#3498db' }}>
@@ -189,15 +181,11 @@ export function SettingsSheet() {
                 min={1}
                 max={60}
                 step={1}
-                className="py-2"
+                className="py-1"
               />
-              <div className="flex justify-between text-xs text-white/30">
-                <span>1 min</span>
-                <span>60 min</span>
-              </div>
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               <div className="flex items-center justify-between">
                 <Label className="text-white/70 text-sm">Long Break After</Label>
                 <span className="text-sm font-mono font-bold text-white/90">
@@ -210,20 +198,16 @@ export function SettingsSheet() {
                 min={2}
                 max={6}
                 step={1}
-                className="py-2"
+                className="py-1"
               />
-              <div className="flex justify-between text-xs text-white/30">
-                <span>2</span>
-                <span>6</span>
-              </div>
             </div>
           </div>
 
           <Separator className="bg-white/10" />
 
           {/* Auto-start Settings */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-white/80 uppercase tracking-wider">Automation</h3>
+          <div className="space-y-3">
+            <h3 className="text-xs font-semibold text-white/50 uppercase tracking-wider">Automation</h3>
 
             <div className="flex items-center justify-between">
               <Label className="text-white/70 text-sm">Auto-start Breaks</Label>
@@ -245,8 +229,8 @@ export function SettingsSheet() {
           <Separator className="bg-white/10" />
 
           {/* Notification Settings */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-white/80 uppercase tracking-wider">Notifications</h3>
+          <div className="space-y-3">
+            <h3 className="text-xs font-semibold text-white/50 uppercase tracking-wider">Notifications</h3>
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -294,43 +278,41 @@ export function SettingsSheet() {
 
           {/* Firebase / FCM Configuration */}
           <Collapsible open={fcmOpen} onOpenChange={setFcmOpen}>
-            <CollapsibleTrigger className="flex items-center justify-between w-full group">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2">
+            <CollapsibleTrigger className="flex items-center justify-between w-full group py-1">
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   {isConfigured ? (
-                    <Wifi className="h-4 w-4 text-white/50" />
+                    <Wifi className="h-3.5 w-3.5 text-white/50" />
                   ) : (
-                    <WifiOff className="h-4 w-4 text-white/50" />
+                    <WifiOff className="h-3.5 w-3.5 text-white/50" />
                   )}
-                  <h3 className="text-sm font-semibold text-white/80 uppercase tracking-wider">
+                  <h3 className="text-xs font-semibold text-white/50 uppercase tracking-wider">
                     Push Server (FCM)
                   </h3>
                 </div>
                 <FcmStatusBadge status={fcmStatus} />
               </div>
               {fcmOpen ? (
-                <ChevronDown className="h-4 w-4 text-white/40 transition-transform" />
+                <ChevronDown className="h-3.5 w-3.5 text-white/40 transition-transform" />
               ) : (
-                <ChevronRight className="h-4 w-4 text-white/40 transition-transform" />
+                <ChevronRight className="h-3.5 w-3.5 text-white/40 transition-transform" />
               )}
             </CollapsibleTrigger>
 
-            <CollapsibleContent className="mt-4 space-y-3">
-              <p className="text-xs text-white/40 leading-relaxed">
+            <CollapsibleContent className="mt-3 space-y-2.5">
+              <p className="text-[11px] text-white/35 leading-relaxed">
                 Enter your Firebase project credentials to enable push notifications that work even when
                 the app is in the background. All values are stored locally on your device.
-                Create a free Firebase project at{' '}
-                <span className="text-white/60">console.firebase.google.com</span>.
               </p>
 
               {FIREBASE_FIELDS.map((field) => (
-                <div key={field.key} className="space-y-1">
+                <div key={field.key} className="space-y-0.5">
                   <div className="flex items-center gap-1">
-                    <Label className="text-white/60 text-xs">
+                    <Label className="text-white/60 text-[11px]">
                       {field.label}
                     </Label>
                     {field.required && (
-                      <span className="text-[10px] text-red-400/70 font-medium">required</span>
+                      <span className="text-[9px] text-red-400/60 font-medium">required</span>
                     )}
                   </div>
                   <Input
@@ -338,17 +320,17 @@ export function SettingsSheet() {
                     value={firebaseConfig[field.key]}
                     onChange={(e) => handleFieldChange(field.key, e.target.value)}
                     placeholder={field.placeholder}
-                    className="h-9 bg-white/5 border-white/10 text-white text-xs font-mono placeholder:text-white/20 focus:border-white/25"
+                    className="h-8 bg-white/5 border-white/10 text-white text-xs font-mono placeholder:text-white/20 focus:border-white/25"
                   />
                 </div>
               ))}
 
-              <div className="flex items-center gap-2 pt-2">
+              <div className="flex items-center gap-2 pt-1">
                 <Button
                   size="sm"
                   onClick={handleConnect}
                   disabled={!isConfigured || fcmStatus === 'connecting'}
-                  className="h-9 px-4 text-xs font-semibold rounded-lg bg-white/10 hover:bg-white/20 text-white disabled:opacity-40"
+                  className="h-8 px-3 text-xs font-semibold rounded-lg bg-white/10 hover:bg-white/20 text-white disabled:opacity-40"
                 >
                   {fcmStatus === 'connecting' ? (
                     <>
@@ -372,7 +354,7 @@ export function SettingsSheet() {
                     size="sm"
                     variant="ghost"
                     onClick={handleClearConfig}
-                    className="h-9 px-3 text-xs text-red-400/60 hover:text-red-400 hover:bg-red-400/10"
+                    className="h-8 px-3 text-xs text-red-400/60 hover:text-red-400 hover:bg-red-400/10"
                   >
                     <Trash2 className="h-3 w-3 mr-1" />
                     Clear
