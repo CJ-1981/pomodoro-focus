@@ -67,17 +67,17 @@ export function TimerControls() {
   const gradient = MODE_GRADIENTS[mode];
 
   return (
-    <div className="flex items-center justify-center gap-6">
+    <div className="flex items-center justify-center gap-8">
       {/* Reset button */}
       <motion.div whileTap={{ scale: 0.9 }}>
         <Button
           variant="ghost"
           size="icon"
-          className="h-16 w-16 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent transition-colors active:scale-95"
+          className="h-[72px] w-[72px] rounded-full text-muted-foreground hover:text-foreground hover:bg-accent transition-colors active:scale-95"
           onClick={handleReset}
           disabled={timerState === 'idle'}
         >
-          <RotateCcw className="h-6 w-6" />
+          <RotateCcw className="h-7 w-7" />
         </Button>
       </motion.div>
 
@@ -85,13 +85,13 @@ export function TimerControls() {
       <motion.div whileTap={{ scale: 0.92 }} whileHover={{ scale: 1.05 }}>
         <Button
           size="icon"
-          className={`h-20 w-20 rounded-full text-white shadow-lg transition-all duration-300 hover:shadow-xl active:scale-95 bg-gradient-to-br ${gradient.from} ${gradient.to} ${gradient.shadow}`}
+          className={`h-24 w-24 rounded-full text-white shadow-lg transition-all duration-300 hover:shadow-xl active:scale-95 bg-gradient-to-br ${gradient.from} ${gradient.to} ${gradient.shadow}`}
           onClick={handleMainAction}
         >
           {isRunning ? (
-            <Pause className="h-8 w-8" fill="currentColor" />
+            <Pause className="h-10 w-10" fill="currentColor" />
           ) : (
-            <Play className="h-8 w-8 ml-1" fill="currentColor" />
+            <Play className="h-10 w-10 ml-1" fill="currentColor" />
           )}
         </Button>
       </motion.div>
@@ -101,11 +101,11 @@ export function TimerControls() {
         <Button
           variant="ghost"
           size="icon"
-          className="h-16 w-16 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent transition-colors active:scale-95"
+          className="h-[72px] w-[72px] rounded-full text-muted-foreground hover:text-foreground hover:bg-accent transition-colors active:scale-95"
           onClick={handleSkip}
           disabled={timerState === 'idle' && completedWorkSessions === 0}
         >
-          <SkipForward className="h-6 w-6" />
+          <SkipForward className="h-7 w-7" />
         </Button>
       </motion.div>
     </div>

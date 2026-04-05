@@ -109,3 +109,32 @@ Stage Summary:
 - Static export ready (output: "export" in next.config.ts)
 - API routes removed; FCM token logged to console for manual use
 - All existing functionality preserved (timer, notifications, settings, FCM config)
+
+---
+Task ID: 4
+Agent: Main Agent
+Task: Make buttons bigger/touch-friendly + Fix iOS Safari horizontal scrolling
+
+Work Log:
+- TimerControls.tsx: Increased play/pause button from h-20 w-20 (80px) to h-24 w-24 (96px), icons from h-8 to h-10
+- TimerControls.tsx: Increased reset/skip buttons from h-16 w-16 (64px) to h-[72px] w-[72px] (72px), icons from h-6 to h-7
+- TimerControls.tsx: Increased gap between buttons from gap-6 to gap-8
+- PomodoroApp.tsx: Changed root from min-h-[100dvh] to h-[100dvh] overflow-hidden to prevent content overflow
+- PomodoroApp.tsx: Added flex-shrink-0 to header/footer, min-h-0 to main to prevent flex overflow
+- PomodoroApp.tsx: Reduced horizontal padding from px-6 to px-5 for more usable space
+- PomodoroApp.tsx: Mode tab buttons increased to min-h-[48px] with px-5 py-3
+- CircularTimer.tsx: Reduced SVG viewBox from 340px to 280px, stroke from 7px to 6px
+- CircularTimer.tsx: Made container responsive with w-full max-w-[300px] aspect-square
+- CircularTimer.tsx: Timer text reduced from text-6xl/7xl to text-5xl/6xl for proportion
+- globals.css: Added position:fixed + overflow:hidden on html,body to prevent iOS Safari bounce/rubber-band
+- globals.css: Added overflow-x:hidden, overscroll-behavior:none, touch-action:manipulation on html
+- globals.css: Replaced safe-area-top/bottom with pt-safe/pb-safe using max() for minimum padding
+- globals.css: Added dvh fallback via @supports for browsers without 100dvh
+- layout.tsx: Added viewportFit:"cover" to viewport meta for proper iOS safe area inset handling
+- Build verified: compiles successfully with zero errors
+
+Stage Summary:
+- 5 files modified: TimerControls.tsx, PomodoroApp.tsx, CircularTimer.tsx, globals.css, layout.tsx
+- Touch targets: play/pause 96px, reset/skip 72px, mode tabs 48px min-height
+- iOS Safari horizontal scroll eliminated via position:fixed viewport lock + responsive timer sizing
+- Safe area insets handled with viewport-fit:cover + max() padding utility classes

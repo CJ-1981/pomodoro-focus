@@ -129,18 +129,21 @@
   * {
     @apply border-border outline-ring/50;
   }
-  body {
+  html {
     @apply bg-background text-foreground;
+    overflow-x: hidden;
+    overscroll-behavior: none;
+    touch-action: manipulation;
+    -webkit-text-size-adjust: 100%;
   }
 }
 
-/* Pomodoro-specific styles */
-.safe-area-top {
-  padding-top: env(safe-area-inset-top, 0px);
-}
-
-.safe-area-bottom {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+/* iOS Safari: lock viewport to prevent bounce/scroll causing layout shifts */
+html, body {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
 /* Custom scrollbar — theme-aware */
@@ -161,10 +164,10 @@
   background: rgba(128, 128, 128, 0.35);
 }
 
-/* Ensure full height on mobile */
+/* Prevent iOS Safari rubber-band horizontal scroll — dvh fallback */
 @supports (height: 100dvh) {
-  .min-h-\[100dvh\] {
-    min-height: 100dvh;
+  .h-\[100dvh\] {
+    height: 100dvh;
   }
 }
 

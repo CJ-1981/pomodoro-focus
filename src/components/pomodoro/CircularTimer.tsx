@@ -17,9 +17,10 @@ export function CircularTimer() {
   const seconds = Math.floor((remainingMs % 60000) / 1000);
   const timeString = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 
-  // Use 340 as default; will re-render with correct value after hydration via useSyncExternalStore
-  const size = 340;
-  const strokeWidth = 7;
+  // Responsive timer size: 340px on larger screens, fits within viewport on small ones
+  // We use CSS max-w to constrain, but keep size=340 for SVG viewBox calculations
+  const size = 280;
+  const strokeWidth = 6;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference * (1 - progress);
@@ -40,13 +41,13 @@ export function CircularTimer() {
   const strokeColor = getStrokeColor();
 
   return (
-    <div className="relative flex items-center justify-center">
+    <div className="relative flex items-center justify-center w-full max-w-[300px] aspect-square">
       {/* Subtle shadow ring */}
       <div
         className="absolute rounded-full"
         style={{
-          width: size + 24,
-          height: size + 24,
+          width: '100%',
+          height: '100%',
           boxShadow: isRunning
             ? `0 0 60px -10px ${strokeColor}`
             : 'none',
@@ -56,8 +57,8 @@ export function CircularTimer() {
       />
 
       <motion.svg
-        width={size}
-        height={size}
+        width="100%"
+        height="100%"
         viewBox={`0 0 ${size} ${size}`}
         className="transform -rotate-90"
         initial={{ scale: 0.8, opacity: 0 }}
@@ -103,7 +104,7 @@ export function CircularTimer() {
         </motion.span>
 
         <motion.span
-          className="font-mono text-6xl sm:text-7xl font-medium text-foreground tabular-nums leading-none"
+          className="font-mono text-5xl sm:text-6xl font-medium text-foreground tabular-nums leading-none"
           key={timeString}
           initial={isRunning ? { scale: 1.02 } : false}
           animate={{ scale: 1 }}

@@ -135,9 +135,9 @@ export function PomodoroApp() {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-background text-foreground flex flex-col">
+    <div className="h-[100dvh] bg-background text-foreground flex flex-col overflow-hidden">
       {/* Header */}
-      <header className="flex items-center justify-between px-6 pt-6 pb-2 safe-area-top">
+      <header className="flex items-center justify-between px-5 pt-safe pb-2 flex-shrink-0">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg bg-pomodoro-work flex items-center justify-center">
             <span className="text-sm">🍅</span>
@@ -151,7 +151,7 @@ export function PomodoroApp() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center justify-center px-6 gap-10 -mt-4">
+      <main className="flex-1 flex flex-col items-center justify-center px-5 gap-8 min-h-0 -mt-2">
         {/* Mode Tabs */}
         <motion.div
           className="flex items-center gap-1 bg-muted/60 rounded-xl p-1 border border-border/50"
@@ -161,7 +161,7 @@ export function PomodoroApp() {
             <button
               key={tab.key}
               onClick={() => handleModeSwitch(tab.key)}
-              className={`relative px-6 py-3 rounded-lg text-sm font-medium transition-all duration-200 min-h-[44px] ${
+              className={`relative px-5 py-3 rounded-lg text-sm font-medium transition-all duration-200 min-h-[48px] ${
                 mode === tab.key
                   ? 'text-foreground'
                   : 'text-muted-foreground hover:text-foreground/70'
@@ -190,7 +190,7 @@ export function PomodoroApp() {
       </main>
 
       {/* Footer */}
-      <footer className="px-6 pb-6 pt-2 safe-area-bottom">
+      <footer className="px-5 pb-safe pt-2 flex-shrink-0">
         <NotificationBanner />
       </footer>
     </div>
