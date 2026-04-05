@@ -9,11 +9,12 @@ import { TimerControls } from './TimerControls';
 import { SessionTracker } from './SessionTracker';
 import { SettingsSheet } from './SettingsSheet';
 import { NotificationBanner } from './NotificationBanner';
+import { ThemeToggle } from './ThemeToggle';
 
 const MODE_TABS = [
-  { key: 'work' as const, label: 'Focus', emoji: '🍅' },
-  { key: 'shortBreak' as const, label: 'Short Break', emoji: '☕' },
-  { key: 'longBreak' as const, label: 'Long Break', emoji: '🌿' },
+  { key: 'work' as const, label: 'Focus' },
+  { key: 'shortBreak' as const, label: 'Short Break' },
+  { key: 'longBreak' as const, label: 'Long Break' },
 ];
 
 export function PomodoroApp() {
@@ -31,7 +32,6 @@ export function PomodoroApp() {
   } = usePomodoroStore();
 
   const fcmInitRef = useRef(false);
-
   const prevCompletedRef = useRef(completedWorkSessions);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -40,7 +40,7 @@ export function PomodoroApp() {
     if (timerState === 'running') {
       intervalRef.current = setInterval(() => {
         tick();
-      }, 100); // 100ms for smooth countdown
+      }, 100);
     } else {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -58,24 +58,19 @@ export function PomodoroApp() {
   // Watch for timer completion
   useEffect(() => {
     if (timerState === 'completed') {
-      // Determine which timer just completed based on mode change
       const currentMode = mode;
 
       if (settings.soundEnabled) playAlarmSound();
       if (settings.vibrationEnabled) triggerVibration();
       if (settings.notificationsEnabled) {
-        // Determine which type was completed - if mode changed, the previous was completed
-        const prevMode = prevCompletedRef.current;
         notifyTimerComplete(currentMode);
       }
 
       // Auto-start next session if enabled
-      if (currentMode === 'shortBreak' && settings.autoStartBreaks) {
-        const timeout = setTimeout(() => {
-          startTimer();
-        }, 1500);
-        return () => clearTimeout(timeout);
-      } else if (currentMode === 'longBreak' && settings.autoStartBreaks) {
+      if (
+        (currentMode === 'shortBreak' || currentMode === 'longBreak') &&
+        settings.autoStartBreaks
+      ) {
         const timeout = setTimeout(() => {
           startTimer();
         }, 1500);
@@ -95,7 +90,6 @@ export function PomodoroApp() {
   }, [completedWorkSessions]);
 
   // Auto-init FCM once after mount when stored config is available
-  // (Zustand persist hydrates from localStorage before first render on client)
   useEffect(() => {
     if (fcmInitRef.current) return;
     fcmInitRef.current = true;
@@ -126,67 +120,61 @@ export function PomodoroApp() {
 
   const handleModeSwitch = useCallback(
     (newMode: typeof MODE_TABS[number]['key']) => {
-      if (timerState === 'running' || timerState === 'paused') {
-        // Allow switching even during running timer
-      }
       switchMode(newMode);
     },
-    [timerState, switchMode]
+    [switchMode]
   );
 
+  const getAccentBg = (tabKey: string) => {
+    switch (tabKey) {
+      case 'work': return 'bg-pomodoro-work/10 border-pomodoro-work/20 text-pomodoro-work';
+      case 'shortBreak': return 'bg-pomodoro-short/10 border-pomodoro-short/20 text-pomodoro-short';
+      case 'longBreak': return 'bg-pomodoro-long/10 border-pomodoro-long/20 text-pomodoro-long';
+      default: return '';
+    }
+  };
+
   return (
-    <div className="min-h-[100dvh] bg-[#0f0f23] text-white flex flex-col">
+    <div className="min-h-[100dvh] bg-background text-foreground flex flex-col">
       {/* Header */}
-      <header className="flex items-center justify-between px-5 pt-6 pb-2 safe-area-top">
-        <div className="flex items-center gap-2">
-          <span className="text-2xl">🍅</span>
-          <h1 className="text-lg font-bold text-white/90">Pomodoro</h1>
+      <header className="flex items-center justify-between px-6 pt-6 pb-2 safe-area-top">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-pomodoro-work flex items-center justify-center">
+            <span className="text-sm">🍅</span>
+          </div>
+          <h1 className="text-lg font-semibold tracking-tight">Pomodoro</h1>
         </div>
-        <SettingsSheet />
+        <div className="flex items-center gap-1">
+          <ThemeToggle />
+          <SettingsSheet />
+        </div>
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center justify-center px-5 gap-8 -mt-4">
+      <main className="flex-1 flex flex-col items-center justify-center px-6 gap-10 -mt-4">
         {/* Mode Tabs */}
         <motion.div
-          className="flex items-center gap-1 bg-white/5 rounded-xl p-1"
+          className="flex items-center gap-1 bg-muted/60 rounded-xl p-1 border border-border/50"
           layout
         >
           {MODE_TABS.map((tab) => (
             <button
               key={tab.key}
               onClick={() => handleModeSwitch(tab.key)}
-              className={`relative px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 ${
+              className={`relative px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                 mode === tab.key
-                  ? 'text-white'
-                  : 'text-white/40 hover:text-white/60'
+                  ? 'text-foreground'
+                  : 'text-muted-foreground hover:text-foreground/70'
               }`}
             >
               {mode === tab.key && (
                 <motion.div
                   layoutId="activeTab"
-                  className="absolute inset-0 rounded-lg"
-                  style={{
-                    background:
-                      tab.key === 'work'
-                        ? 'rgba(231, 76, 60, 0.2)'
-                        : tab.key === 'shortBreak'
-                          ? 'rgba(26, 188, 156, 0.2)'
-                          : 'rgba(52, 152, 219, 0.2)',
-                    border: `1px solid ${
-                      tab.key === 'work'
-                        ? 'rgba(231, 76, 60, 0.3)'
-                        : tab.key === 'shortBreak'
-                          ? 'rgba(26, 188, 156, 0.3)'
-                          : 'rgba(52, 152, 219, 0.3)'
-                    }`,
-                  }}
+                  className={`absolute inset-0 rounded-lg border ${getAccentBg(tab.key)}`}
                   transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
                 />
               )}
-              <span className="relative z-10">
-                {tab.emoji} {tab.label}
-              </span>
+              <span className="relative z-10">{tab.label}</span>
             </button>
           ))}
         </motion.div>
@@ -202,7 +190,7 @@ export function PomodoroApp() {
       </main>
 
       {/* Footer */}
-      <footer className="px-5 pb-6 pt-2 safe-area-bottom">
+      <footer className="px-6 pb-6 pt-2 safe-area-bottom">
         <NotificationBanner />
       </footer>
     </div>

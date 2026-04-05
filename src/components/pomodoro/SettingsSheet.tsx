@@ -54,25 +54,25 @@ function FcmStatusBadge({ status }: { status: string }) {
   switch (status) {
     case 'connected':
       return (
-        <span className="inline-flex items-center gap-1 text-xs font-medium text-green-400">
+        <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-500">
           <CheckCircle2 className="h-3 w-3" /> Connected
         </span>
       );
     case 'connecting':
       return (
-        <span className="inline-flex items-center gap-1 text-xs font-medium text-yellow-400">
+        <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-500">
           <Loader2 className="h-3 w-3 animate-spin" /> Connecting...
         </span>
       );
     case 'error':
       return (
-        <span className="inline-flex items-center gap-1 text-xs font-medium text-red-400">
+        <span className="inline-flex items-center gap-1 text-xs font-medium text-red-500">
           <XCircle className="h-3 w-3" /> Error
         </span>
       );
     default:
       return (
-        <span className="inline-flex items-center gap-1 text-xs font-medium text-white/40">
+        <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground/60">
           <WifiOff className="h-3 w-3" /> Not configured
         </span>
       );
@@ -112,7 +112,7 @@ export function SettingsSheet() {
         <Button
           variant="ghost"
           size="icon"
-          className="h-10 w-10 rounded-full text-white/60 hover:text-white hover:bg-white/10"
+          className="h-10 w-10 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent"
         >
           <Settings className="h-5 w-5" />
         </Button>
@@ -120,24 +120,24 @@ export function SettingsSheet() {
 
       <SheetContent
         side="bottom"
-        className="bg-[#1a1a35] border-t border-white/10 text-white rounded-t-2xl max-h-[85vh] overflow-y-auto max-w-lg mx-auto left-0 right-0 px-5 pt-4 pb-32"
+        className="bg-card border-t border-border text-card-foreground rounded-t-2xl max-h-[85vh] overflow-y-auto max-w-lg mx-auto left-0 right-0 px-6 pt-4 pb-32"
       >
         <SheetHeader className="text-left pb-0 px-0">
-          <SheetTitle className="text-white text-base">Timer Settings</SheetTitle>
-          <SheetDescription className="text-white/40 text-xs">
+          <SheetTitle className="text-card-foreground text-base">Timer Settings</SheetTitle>
+          <SheetDescription className="text-muted-foreground text-xs">
             Customize your Pomodoro experience
           </SheetDescription>
         </SheetHeader>
 
-        <div className="space-y-4 mt-3">
+        <div className="space-y-5 mt-4">
           {/* Duration Settings */}
-          <div className="space-y-3">
-            <h3 className="text-xs font-semibold text-white/50 uppercase tracking-wider">Duration</h3>
+          <div className="space-y-4">
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Duration</h3>
 
-            <div className="space-y-0.5">
+            <div className="space-y-1">
               <div className="flex items-center justify-between">
-                <Label className="text-white/70 text-sm">Focus Duration</Label>
-                <span className="text-sm font-mono font-bold" style={{ color: '#e74c3c' }}>
+                <Label className="text-foreground/80 text-sm">Focus Duration</Label>
+                <span className="text-sm font-mono font-semibold text-pomodoro-work">
                   {settings.workDuration} min
                 </span>
               </div>
@@ -147,14 +147,14 @@ export function SettingsSheet() {
                 min={1}
                 max={60}
                 step={1}
-                className="py-1"
+                className="py-2"
               />
             </div>
 
-            <div className="space-y-0.5">
+            <div className="space-y-1">
               <div className="flex items-center justify-between">
-                <Label className="text-white/70 text-sm">Short Break</Label>
-                <span className="text-sm font-mono font-bold" style={{ color: '#1abc9c' }}>
+                <Label className="text-foreground/80 text-sm">Short Break</Label>
+                <span className="text-sm font-mono font-semibold text-pomodoro-short">
                   {settings.shortBreakDuration} min
                 </span>
               </div>
@@ -164,14 +164,14 @@ export function SettingsSheet() {
                 min={1}
                 max={30}
                 step={1}
-                className="py-1"
+                className="py-2"
               />
             </div>
 
-            <div className="space-y-0.5">
+            <div className="space-y-1">
               <div className="flex items-center justify-between">
-                <Label className="text-white/70 text-sm">Long Break</Label>
-                <span className="text-sm font-mono font-bold" style={{ color: '#3498db' }}>
+                <Label className="text-foreground/80 text-sm">Long Break</Label>
+                <span className="text-sm font-mono font-semibold text-pomodoro-long">
                   {settings.longBreakDuration} min
                 </span>
               </div>
@@ -181,14 +181,14 @@ export function SettingsSheet() {
                 min={1}
                 max={60}
                 step={1}
-                className="py-1"
+                className="py-2"
               />
             </div>
 
-            <div className="space-y-0.5">
+            <div className="space-y-1">
               <div className="flex items-center justify-between">
-                <Label className="text-white/70 text-sm">Long Break After</Label>
-                <span className="text-sm font-mono font-bold text-white/90">
+                <Label className="text-foreground/80 text-sm">Long Break After</Label>
+                <span className="text-sm font-mono font-semibold text-foreground">
                   {settings.longBreakInterval} sessions
                 </span>
               </div>
@@ -198,19 +198,19 @@ export function SettingsSheet() {
                 min={2}
                 max={6}
                 step={1}
-                className="py-1"
+                className="py-2"
               />
             </div>
           </div>
 
-          <Separator className="bg-white/10" />
+          <Separator />
 
           {/* Auto-start Settings */}
           <div className="space-y-3">
-            <h3 className="text-xs font-semibold text-white/50 uppercase tracking-wider">Automation</h3>
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Automation</h3>
 
             <div className="flex items-center justify-between">
-              <Label className="text-white/70 text-sm">Auto-start Breaks</Label>
+              <Label className="text-foreground/80 text-sm">Auto-start Breaks</Label>
               <Switch
                 checked={settings.autoStartBreaks}
                 onCheckedChange={(v) => updateSettings({ autoStartBreaks: v })}
@@ -218,7 +218,7 @@ export function SettingsSheet() {
             </div>
 
             <div className="flex items-center justify-between">
-              <Label className="text-white/70 text-sm">Auto-start Work</Label>
+              <Label className="text-foreground/80 text-sm">Auto-start Work</Label>
               <Switch
                 checked={settings.autoStartWork}
                 onCheckedChange={(v) => updateSettings({ autoStartWork: v })}
@@ -226,20 +226,20 @@ export function SettingsSheet() {
             </div>
           </div>
 
-          <Separator className="bg-white/10" />
+          <Separator />
 
           {/* Notification Settings */}
           <div className="space-y-3">
-            <h3 className="text-xs font-semibold text-white/50 uppercase tracking-wider">Notifications</h3>
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Notifications</h3>
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 {settings.soundEnabled ? (
-                  <Volume2 className="h-4 w-4 text-white/50" />
+                  <Volume2 className="h-4 w-4 text-muted-foreground" />
                 ) : (
-                  <VolumeX className="h-4 w-4 text-white/50" />
+                  <VolumeX className="h-4 w-4 text-muted-foreground" />
                 )}
-                <Label className="text-white/70 text-sm">Alarm Sound</Label>
+                <Label className="text-foreground/80 text-sm">Alarm Sound</Label>
               </div>
               <Switch
                 checked={settings.soundEnabled}
@@ -249,8 +249,8 @@ export function SettingsSheet() {
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Smartphone className="h-4 w-4 text-white/50" />
-                <Label className="text-white/70 text-sm">Vibration</Label>
+                <Smartphone className="h-4 w-4 text-muted-foreground" />
+                <Label className="text-foreground/80 text-sm">Vibration</Label>
               </div>
               <Switch
                 checked={settings.vibrationEnabled}
@@ -261,11 +261,11 @@ export function SettingsSheet() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 {settings.notificationsEnabled ? (
-                  <Bell className="h-4 w-4 text-white/50" />
+                  <Bell className="h-4 w-4 text-muted-foreground" />
                 ) : (
-                  <BellOff className="h-4 w-4 text-white/50" />
+                  <BellOff className="h-4 w-4 text-muted-foreground" />
                 )}
-                <Label className="text-white/70 text-sm">Push Notifications</Label>
+                <Label className="text-foreground/80 text-sm">Push Notifications</Label>
               </div>
               <Switch
                 checked={settings.notificationsEnabled}
@@ -274,7 +274,7 @@ export function SettingsSheet() {
             </div>
           </div>
 
-          <Separator className="bg-white/10" />
+          <Separator />
 
           {/* Firebase / FCM Configuration */}
           <Collapsible open={fcmOpen} onOpenChange={setFcmOpen}>
@@ -282,37 +282,37 @@ export function SettingsSheet() {
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1.5">
                   {isConfigured ? (
-                    <Wifi className="h-3.5 w-3.5 text-white/50" />
+                    <Wifi className="h-3.5 w-3.5 text-muted-foreground" />
                   ) : (
-                    <WifiOff className="h-3.5 w-3.5 text-white/50" />
+                    <WifiOff className="h-3.5 w-3.5 text-muted-foreground" />
                   )}
-                  <h3 className="text-xs font-semibold text-white/50 uppercase tracking-wider">
+                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Push Server (FCM)
                   </h3>
                 </div>
                 <FcmStatusBadge status={fcmStatus} />
               </div>
               {fcmOpen ? (
-                <ChevronDown className="h-3.5 w-3.5 text-white/40 transition-transform" />
+                <ChevronDown className="h-3.5 w-3.5 text-muted-foreground/60 transition-transform" />
               ) : (
-                <ChevronRight className="h-3.5 w-3.5 text-white/40 transition-transform" />
+                <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60 transition-transform" />
               )}
             </CollapsibleTrigger>
 
             <CollapsibleContent className="mt-3 space-y-2.5">
-              <p className="text-[11px] text-white/35 leading-relaxed">
+              <p className="text-[11px] text-muted-foreground/70 leading-relaxed">
                 Enter your Firebase project credentials to enable push notifications that work even when
                 the app is in the background. All values are stored locally on your device.
               </p>
 
               {FIREBASE_FIELDS.map((field) => (
-                <div key={field.key} className="space-y-0.5">
+                <div key={field.key} className="space-y-1">
                   <div className="flex items-center gap-1">
-                    <Label className="text-white/60 text-[11px]">
+                    <Label className="text-muted-foreground text-[11px]">
                       {field.label}
                     </Label>
                     {field.required && (
-                      <span className="text-[9px] text-red-400/60 font-medium">required</span>
+                      <span className="text-[9px] text-red-400/70 font-medium">required</span>
                     )}
                   </div>
                   <Input
@@ -320,7 +320,7 @@ export function SettingsSheet() {
                     value={firebaseConfig[field.key]}
                     onChange={(e) => handleFieldChange(field.key, e.target.value)}
                     placeholder={field.placeholder}
-                    className="h-8 bg-white/5 border-white/10 text-white text-xs font-mono placeholder:text-white/20 focus:border-white/25"
+                    className="h-8 bg-muted border-border text-foreground text-xs font-mono placeholder:text-muted-foreground/40 focus:border-ring"
                   />
                 </div>
               ))}
@@ -330,7 +330,7 @@ export function SettingsSheet() {
                   size="sm"
                   onClick={handleConnect}
                   disabled={!isConfigured || fcmStatus === 'connecting'}
-                  className="h-8 px-3 text-xs font-semibold rounded-lg bg-white/10 hover:bg-white/20 text-white disabled:opacity-40"
+                  className="h-8 px-3 text-xs font-semibold rounded-lg bg-secondary hover:bg-accent text-foreground disabled:opacity-40"
                 >
                   {fcmStatus === 'connecting' ? (
                     <>
@@ -354,7 +354,7 @@ export function SettingsSheet() {
                     size="sm"
                     variant="ghost"
                     onClick={handleClearConfig}
-                    className="h-8 px-3 text-xs text-red-400/60 hover:text-red-400 hover:bg-red-400/10"
+                    className="h-8 px-3 text-xs text-red-500/70 hover:text-red-500 hover:bg-red-500/10"
                   >
                     <Trash2 className="h-3 w-3 mr-1" />
                     Clear

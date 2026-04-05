@@ -21,6 +21,15 @@ export function hasNotificationPermission(): boolean {
 /**
  * Initialize FCM using config from the store (localStorage).
  * Returns the FCM token on success, null otherwise.
+ *
+ * NOTE: This is a static export — there is no backend to store the FCM token or
+ * send push notifications. For full push notification support, you would need a
+ * serverless function, Cloud Function, or external service to:
+ *   1. Store the FCM token
+ *   2. Send push messages via the Firebase Cloud Messaging HTTP API
+ *
+ * The token is logged to the console so you can manually use it for testing.
+ * Local notifications (Notification API) still work without any server.
  */
 export async function initFCM(config: FirebaseConfig): Promise<string | null> {
   if (typeof window === 'undefined') return null;
@@ -54,14 +63,12 @@ export async function initFCM(config: FirebaseConfig): Promise<string | null> {
       });
     }
 
-    // Send token to our API
-    await fetch('/api/fcm-token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token }),
-    });
+    // Log token for manual use — in a static export there is no server endpoint
+    console.log(
+      '[Pomodoro] FCM initialized successfully. Token (save this for testing):',
+      token
+    );
 
-    console.log('FCM initialized successfully. Token:', token.substring(0, 20) + '...');
     return token;
   } catch (error) {
     console.error('FCM initialization failed:', error);

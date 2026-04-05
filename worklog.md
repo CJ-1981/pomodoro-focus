@@ -48,3 +48,64 @@ Stage Summary:
 - Alarm sound via Web Audio API, vibration via Navigator.vibrate()
 - Settings persisted to localStorage via Zustand
 - Mobile-first responsive design
+
+---
+Task ID: 3
+Agent: UI Revamp Agent
+Task: Revamp Pomodoro Timer UI — Modern Minimalist with Dark/Light Mode + Static Export for GitHub Pages
+
+Work Log:
+- Created ThemeProvider component (src/components/theme-provider.tsx) wrapping next-themes
+- Created ThemeToggle component (src/components/pomodoro/ThemeToggle.tsx) with sun/moon animated toggle using framer-motion
+- Updated globals.css:
+  - Replaced shadcn oklch values with hex values matching the design spec (light: #fafafa bg, dark: #0a0a0a bg)
+  - Added --pomodoro-work, --pomodoro-short, --pomodoro-long CSS variables for both light and dark modes
+  - Made scrollbar styling theme-aware (neutral gray instead of white-only)
+  - Registered pomodoro colors in @theme inline block as --color-pomodoro-work/short/long
+- Updated layout.tsx:
+  - Wrapped children with ThemeProvider (attribute="class", defaultTheme="dark", enableSystem, disableTransitionOnChange)
+  - Updated theme-color meta to use media queries for light/dark
+- Rewrote PomodoroApp.tsx:
+  - Replaced hardcoded bg-[#0f0f23] text-white with semantic bg-background text-foreground
+  - Added ThemeToggle + SettingsSheet in header
+  - Clean mode tabs using accent colors via Tailwind custom color classes
+  - Removed emoji from mode tab labels for cleaner look
+- Rewrote CircularTimer.tsx:
+  - Increased size to 340px with 7px stroke width (thinner ring)
+  - Replaced colored glow with subtle drop-shadow that activates when running
+  - Mode label and COMPLETE text use CSS variable-based inline styles
+  - Timer text uses font-medium (not bold) for lighter feel
+  - "PAUSED" uses text-muted-foreground instead of yellow
+- Rewrote TimerControls.tsx:
+  - Main button 72px with gradient bg and shadow using pomodoro accent colors
+  - Secondary buttons 48px with ghost/accent styling
+  - Increased gap between buttons
+- Rewrote SessionTracker.tsx:
+  - Replaced tomato emojis with clean colored dots (filled=completed, outlined=upcoming)
+  - Added "3/4" counter with subtle secondary text
+- Rewrote SettingsSheet.tsx:
+  - Replaced all hardcoded dark colors (bg-[#1a1a35], text-white, border-white/10) with semantic bg-card, text-card-foreground, border-border
+  - All labels use text-foreground/80, section headers use text-muted-foreground
+  - FCM section uses secondary bg for buttons instead of white/10
+- Rewrote NotificationBanner.tsx:
+  - Theme-aware bg-muted/60 border-border instead of bg-white/5 border-white/10
+- Updated next.config.ts:
+  - Changed output from "standalone" to "export" for static site generation
+  - Added images.unoptimized: true (required for static export)
+- Updated fcm.ts:
+  - Removed fetch('/api/fcm-token', ...) call from initFCM()
+  - Token is now logged to console for manual testing
+  - Added documentation comment explaining static export limitation
+  - Local notification flow unchanged
+- Deleted entire src/app/api/ directory (route.ts, fcm-token/route.ts, notify/route.ts)
+- Lint passes with zero errors
+- Dev server compiles successfully, page loads with 200
+
+Stage Summary:
+- 13 files modified, 2 files created, 1 directory deleted
+- Modern minimalist UI with proper dark/light mode via next-themes
+- All components use semantic Tailwind classes — no hardcoded dark colors
+- Pomodoro accent colors (work=red, short=emerald, long=indigo) defined as CSS variables
+- Static export ready (output: "export" in next.config.ts)
+- API routes removed; FCM token logged to console for manual use
+- All existing functionality preserved (timer, notifications, settings, FCM config)

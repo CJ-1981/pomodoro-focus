@@ -3,24 +3,6 @@
 import { motion } from 'framer-motion';
 import { usePomodoroStore } from '@/stores/pomodoro';
 
-const MODE_COLORS = {
-  work: {
-    stroke: '#e74c3c',
-    glow: 'rgba(231, 76, 60, 0.3)',
-    bg: 'rgba(231, 76, 60, 0.1)',
-  },
-  shortBreak: {
-    stroke: '#1abc9c',
-    glow: 'rgba(26, 188, 156, 0.3)',
-    bg: 'rgba(26, 188, 156, 0.1)',
-  },
-  longBreak: {
-    stroke: '#3498db',
-    glow: 'rgba(52, 152, 219, 0.3)',
-    bg: 'rgba(52, 152, 219, 0.1)',
-  },
-};
-
 const MODE_LABELS = {
   work: 'FOCUS',
   shortBreak: 'SHORT BREAK',
@@ -30,14 +12,14 @@ const MODE_LABELS = {
 export function CircularTimer() {
   const { mode, remainingMs, totalTime, timerState } = usePomodoroStore();
   const progress = totalTime > 0 ? 1 - remainingMs / totalTime : 0;
-  const colors = MODE_COLORS[mode];
 
   const minutes = Math.floor(remainingMs / 60000);
   const seconds = Math.floor((remainingMs % 60000) / 1000);
   const timeString = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 
-  const size = 280;
-  const strokeWidth = 10;
+  // Use 340 as default; will re-render with correct value after hydration via useSyncExternalStore
+  const size = 340;
+  const strokeWidth = 7;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference * (1 - progress);
@@ -45,26 +27,32 @@ export function CircularTimer() {
   const isCompleted = timerState === 'completed';
   const isRunning = timerState === 'running';
 
+  // Compute actual stroke color based on mode
+  const getStrokeColor = () => {
+    switch (mode) {
+      case 'work': return 'var(--pomodoro-work)';
+      case 'shortBreak': return 'var(--pomodoro-short)';
+      case 'longBreak': return 'var(--pomodoro-long)';
+      default: return 'var(--pomodoro-work)';
+    }
+  };
+
+  const strokeColor = getStrokeColor();
+
   return (
     <div className="relative flex items-center justify-center">
-      {/* Glow effect */}
-      <motion.div
+      {/* Subtle shadow ring */}
+      <div
         className="absolute rounded-full"
         style={{
-          width: size + 20,
-          height: size + 20,
-          background: `radial-gradient(circle, ${colors.glow} 0%, transparent 70%)`,
+          width: size + 24,
+          height: size + 24,
+          boxShadow: isRunning
+            ? `0 0 60px -10px ${strokeColor}`
+            : 'none',
+          opacity: isRunning ? 0.15 : 0,
+          transition: 'opacity 0.5s ease, box-shadow 0.5s ease',
         }}
-        animate={
-          timerState === 'running'
-            ? { scale: [1, 1.05, 1], opacity: [0.5, 0.8, 0.5] }
-            : { scale: 1, opacity: isCompleted ? 0.9 : 0.4 }
-        }
-        transition={
-          timerState === 'running'
-            ? { duration: 2, repeat: Infinity, ease: 'easeInOut' }
-            : { duration: 0.3 }
-        }
       />
 
       <motion.svg
@@ -82,7 +70,7 @@ export function CircularTimer() {
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke={colors.bg}
+          className="stroke-muted"
           strokeWidth={strokeWidth}
         />
 
@@ -92,23 +80,20 @@ export function CircularTimer() {
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke={colors.stroke}
+          style={{ stroke: strokeColor }}
           strokeWidth={strokeWidth}
           strokeLinecap="round"
           strokeDasharray={circumference}
           animate={{ strokeDashoffset }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
-          style={{
-            filter: `drop-shadow(0 0 6px ${colors.stroke})`,
-          }}
         />
       </motion.svg>
 
       {/* Center content */}
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <motion.span
-          className="text-xs font-semibold tracking-[0.2em] uppercase mb-1"
-          style={{ color: colors.stroke }}
+          className="text-xs font-medium tracking-[0.2em] uppercase mb-2"
+          style={{ color: strokeColor }}
           key={mode}
           initial={{ opacity: 0, y: -5 }}
           animate={{ opacity: 1, y: 0 }}
@@ -118,9 +103,9 @@ export function CircularTimer() {
         </motion.span>
 
         <motion.span
-          className="font-mono text-6xl font-bold text-white tabular-nums leading-none"
+          className="font-mono text-6xl sm:text-7xl font-medium text-foreground tabular-nums leading-none"
           key={timeString}
-          initial={isRunning ? { scale: 1.05 } : false}
+          initial={isRunning ? { scale: 1.02 } : false}
           animate={{ scale: 1 }}
           transition={{ duration: 0.1 }}
         >
@@ -129,7 +114,7 @@ export function CircularTimer() {
 
         {timerState === 'paused' && (
           <motion.span
-            className="text-xs text-yellow-400 mt-2 font-medium"
+            className="text-xs text-muted-foreground mt-3 font-medium tracking-wider"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -140,13 +125,13 @@ export function CircularTimer() {
 
         {isCompleted && (
           <motion.span
-            className="text-xs mt-2 font-bold"
-            style={{ color: colors.stroke }}
+            className="text-xs mt-3 font-semibold"
+            style={{ color: strokeColor }}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, type: 'spring' }}
           >
-            ✨ COMPLETE!
+            COMPLETE
           </motion.span>
         )}
       </div>

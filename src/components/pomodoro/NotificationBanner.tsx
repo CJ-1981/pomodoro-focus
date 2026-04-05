@@ -42,7 +42,7 @@ export function NotificationBanner() {
   const handleRequestPermission = useCallback(async () => {
     try {
       await requestNotificationPermission();
-      notifyPermissionListeners(); // trigger re-render to pick up new permission
+      notifyPermissionListeners();
       if (typeof window !== 'undefined' && Notification.permission === 'granted') {
         setTimeout(() => setDismissed(true), 2000);
       }
@@ -59,13 +59,13 @@ export function NotificationBanner() {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
-      className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-3"
+      className="flex items-center gap-3 bg-muted/60 border border-border rounded-xl px-4 py-3"
     >
       <div className="flex-shrink-0">
-        <BellRing className="h-4 w-4 text-yellow-400" />
+        <BellRing className="h-4 w-4 text-amber-500" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-white/70">
+        <p className="text-xs text-muted-foreground">
           {permission === 'denied'
             ? 'Notifications are blocked. Enable them in browser settings for timer alerts.'
             : 'Enable notifications to get timer alerts even when the app is in background.'}
@@ -75,7 +75,7 @@ export function NotificationBanner() {
         <Button
           size="sm"
           variant="ghost"
-          className="h-8 px-3 text-xs font-semibold rounded-lg bg-white/10 hover:bg-white/20 text-white flex-shrink-0"
+          className="h-8 px-3 text-xs font-semibold rounded-lg bg-secondary hover:bg-accent text-foreground flex-shrink-0"
           onClick={handleRequestPermission}
         >
           Enable
@@ -85,7 +85,7 @@ export function NotificationBanner() {
         <Button
           size="sm"
           variant="ghost"
-          className="h-8 px-3 text-xs text-white/40 flex-shrink-0"
+          className="h-8 px-3 text-xs text-muted-foreground/60 flex-shrink-0"
           onClick={() => setDismissed(true)}
         >
           Dismiss
