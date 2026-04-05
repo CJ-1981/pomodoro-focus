@@ -136,49 +136,53 @@ export function PomodoroApp() {
 
   return (
     <div className="fixed inset-0 bg-background text-foreground flex flex-col">
-      {/* Header */}
-      <header className="flex items-center justify-between px-5 pt-safe pb-1 flex-shrink-0">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-pomodoro-work flex items-center justify-center">
-            <span className="text-sm">🍅</span>
+      {/* Header + Mode Tabs */}
+      <div className="flex-shrink-0">
+        <header className="flex items-center justify-between px-5 pt-safe pb-1">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-pomodoro-work flex items-center justify-center">
+              <span className="text-sm">🍅</span>
+            </div>
+            <h1 className="text-lg font-semibold tracking-tight">Pomodoro</h1>
           </div>
-          <h1 className="text-lg font-semibold tracking-tight">Pomodoro</h1>
-        </div>
-        <div className="flex items-center gap-1">
-          <ThemeToggle />
-          <SettingsSheet />
-        </div>
-      </header>
+          <div className="flex items-center gap-1">
+            <ThemeToggle />
+            <SettingsSheet />
+          </div>
+        </header>
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center justify-center px-5 gap-6 min-h-0">
-        {/* Mode Tabs */}
-        <motion.div
-          className="flex items-center gap-1 bg-muted/60 rounded-xl p-1 border border-border/50"
-          layout
-        >
-          {MODE_TABS.map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => handleModeSwitch(tab.key)}
-              className={`relative px-5 py-3 rounded-lg text-sm font-medium transition-all duration-200 min-h-[48px] ${
-                mode === tab.key
-                  ? 'text-foreground'
-                  : 'text-muted-foreground hover:text-foreground/70'
-              }`}
-            >
-              {mode === tab.key && (
-                <motion.div
-                  layoutId="activeTab"
-                  className={`absolute inset-0 rounded-lg border ${getAccentBg(tab.key)}`}
-                  transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
-                />
-              )}
-              <span className="relative z-10">{tab.label}</span>
-            </button>
-          ))}
-        </motion.div>
+        {/* Mode Tabs — pinned below header, never overlaps */}
+        <div className="flex justify-center px-5 pt-1 pb-2">
+          <motion.div
+            className="flex items-center gap-1 bg-muted/60 rounded-xl p-1 border border-border/50"
+            layout
+          >
+            {MODE_TABS.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => handleModeSwitch(tab.key)}
+                className={`relative px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 min-h-[44px] ${
+                  mode === tab.key
+                    ? 'text-foreground'
+                    : 'text-muted-foreground hover:text-foreground/70'
+                }`}
+              >
+                {mode === tab.key && (
+                  <motion.div
+                    layoutId="activeTab"
+                    className={`absolute inset-0 rounded-lg border ${getAccentBg(tab.key)}`}
+                    transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
+                  />
+                )}
+                <span className="relative z-10">{tab.label}</span>
+              </button>
+            ))}
+          </motion.div>
+        </div>
+      </div>
 
+      {/* Main Content — only timer + controls + tracker, centered */}
+      <main className="flex-1 flex flex-col items-center justify-center px-5 gap-5 min-h-0 overflow-hidden">
         {/* Circular Timer */}
         <CircularTimer />
 
