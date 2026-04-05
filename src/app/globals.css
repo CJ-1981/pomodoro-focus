@@ -129,21 +129,17 @@
   * {
     @apply border-border outline-ring/50;
   }
-  html {
+  html, body {
     @apply bg-background text-foreground;
-    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
     overscroll-behavior: none;
-    touch-action: manipulation;
     -webkit-text-size-adjust: 100%;
+    -webkit-overflow-scrolling: touch;
   }
-}
-
-/* iOS Safari: lock viewport to prevent bounce/scroll causing layout shifts */
-html, body {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
 }
 
 /* Custom scrollbar — theme-aware */
@@ -162,13 +158,6 @@ html, body {
 
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
   background: rgba(128, 128, 128, 0.35);
-}
-
-/* Prevent iOS Safari rubber-band horizontal scroll — dvh fallback */
-@supports (height: 100dvh) {
-  .h-\[100dvh\] {
-    height: 100dvh;
-  }
 }
 
 /* Prevent text selection on timer */

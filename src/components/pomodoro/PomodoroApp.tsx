@@ -135,9 +135,9 @@ export function PomodoroApp() {
   };
 
   return (
-    <div className="h-[100dvh] bg-background text-foreground flex flex-col overflow-hidden">
+    <div className="fixed inset-0 bg-background text-foreground flex flex-col">
       {/* Header */}
-      <header className="flex items-center justify-between px-5 pt-safe pb-2 flex-shrink-0">
+      <header className="flex items-center justify-between px-5 pt-safe pb-1 flex-shrink-0">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg bg-pomodoro-work flex items-center justify-center">
             <span className="text-sm">🍅</span>
@@ -151,7 +151,7 @@ export function PomodoroApp() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center justify-center px-5 gap-8 min-h-0 -mt-2">
+      <main className="flex-1 flex flex-col items-center justify-center px-5 gap-6 min-h-0">
         {/* Mode Tabs */}
         <motion.div
           className="flex items-center gap-1 bg-muted/60 rounded-xl p-1 border border-border/50"
