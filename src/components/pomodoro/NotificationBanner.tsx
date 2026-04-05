@@ -1,21 +1,26 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { BellRing } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { requestNotificationPermission } from '@/lib/fcm';
 
-type NotificationStatus = 'default' | 'granted' | 'denied' | 'unsupported';
+type NotificationStatus = 'default' | 'granted' | 'denied' | 'unsupported' | 'loading';
 
-function getInitialPermission(): NotificationStatus {
-  if (typeof window === 'undefined') return 'unsupported';
+function getPermissionStatus(): NotificationStatus {
+  if (typeof window === 'undefined') return 'loading';
   if (!('Notification' in window)) return 'unsupported';
   return Notification.permission;
 }
 
 export function NotificationBanner() {
-  const [permission, setPermission] = useState<NotificationStatus>(getInitialPermission);
+  const [permission, setPermission] = useState<NotificationStatus>('loading');
+
+  // Read permission only on client after mount to avoid hydration mismatch
+  useEffect(() => {
+    setPermission(getPermissionStatus());
+  }, []);
   const [dismissed, setDismissed] = useState(false);
 
   const handleRequestPermission = useCallback(async () => {
@@ -31,7 +36,7 @@ export function NotificationBanner() {
   }, []);
 
   // Don't show if permission already granted, unsupported, or dismissed
-  if (permission === 'granted' || permission === 'unsupported' || dismissed) return null;
+  if (permission === 'loading' || permission === 'granted' || permission === 'unsupported' || dismissed) return null;
 
   return (
     <motion.div
