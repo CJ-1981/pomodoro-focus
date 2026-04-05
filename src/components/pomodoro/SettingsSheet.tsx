@@ -120,7 +120,7 @@ export function SettingsSheet() {
 
       <SheetContent
         side="bottom"
-        className="bg-[#1a1a35] border-t border-white/10 text-white rounded-t-2xl max-h-[85vh] overflow-y-auto max-w-lg mx-auto left-0 right-0 px-5 pt-4 pb-8"
+        className="bg-[#1a1a35] border-t border-white/10 text-white rounded-t-2xl max-h-[85vh] overflow-y-auto max-w-lg mx-auto left-0 right-0 px-5 pt-4 pb-32"
       >
         <SheetHeader className="text-left pb-0 px-0">
           <SheetTitle className="text-white text-base">Timer Settings</SheetTitle>
