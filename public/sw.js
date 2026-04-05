@@ -1,7 +1,13 @@
-const CACHE_NAME = 'pomodoro-v1';
+const CACHE_NAME = 'pomodoro-v2';
+
+// Use relative paths so this works under any basePath (e.g. /repo-name/)
+// self.location gives us the SW scope automatically
+const BASE = self.location.pathname.replace(/\/sw\.js$/, '') || '/';
+
 const ASSETS = [
-  '/',
-  '/manifest.json',
+  './',
+  './manifest.json',
+  './icons/icon-192.png',
 ];
 
 // Install
@@ -45,8 +51,8 @@ self.addEventListener('push', (event) => {
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
-      icon: '/icons/icon-192.png',
-      badge: '/icons/icon-192.png',
+      icon: './icons/icon-192.png',
+      badge: './icons/icon-192.png',
       vibrate: [200, 100, 200, 100, 200, 100, 200],
       requireInteraction: true,
       tag: 'pomodoro-timer',
@@ -60,7 +66,7 @@ self.addEventListener('notificationclick', (event) => {
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
       if (clients.length > 0) return clients[0].focus();
-      return self.clients.openWindow('/');
+      return self.clients.openWindow(BASE);
     })
   );
 });

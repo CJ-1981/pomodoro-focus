@@ -82,8 +82,8 @@ export function sendLocalNotification(title: string, body: string, tag: string =
 
   new Notification(title, {
     body,
-    icon: '/icons/icon-192.png',
-    badge: '/icons/icon-192.png',
+    icon: './icons/icon-192.png',
+    badge: './icons/icon-192.png',
     tag,
     vibrate: [200, 100, 200, 100, 200, 100, 200],
     requireInteraction: true,
