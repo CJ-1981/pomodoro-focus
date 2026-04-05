@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://ntfy.sh",
+    "name": "ntfy.sh | Send push notifications to your phone via PUT/POST",
+    "snippet": "It allows you to send notifications to your phone or desktop via scripts from any computer, and/or using a REST API. It's infinitely flexible, and 100% free ... Missing: backend 2025\nIt allows you to send notifications to your phone or desktop via scripts from any computer, and/or using a REST API. It's infinitely flexible, and 100% free ... Missing: backend | Show results with: backend",
+    "host_name": "ntfy.sh",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/selfhosted/comments/1hzvkdn/ntfy_alternative_similar_to_telegram",
+    "name": "Ntfy alternative similar to Telegram : r/selfhosted - Reddit",
+    "snippet": "I'm looking for an alternative to Ntfy to replace all my Telegram bots to internal-use-only chats. Right now I'm using Ntfy for my backup job notifications. Ntfy — Self-hosted push notification server for all your services Just came across this nice self-hosted push notification service More results from www.reddit.com",
+    "host_name": "www.reddit.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://railway.com/deploy/ntfy",
+    "name": "Deploy ntfy (Open-Source Notification & Push Messaging Service)",
+    "snippet": "Ntfy.sh is a free, open-source notification service that lets you send real-time push notifications to your devices using simple HTTP ...",
+    "host_name": "railway.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gotify.net",
+    "name": "Gotify",
+    "snippet": "An android client for subscribing to the message stream of gotify/server. The app creates push notifications on newly received messages. ... Google Play and the ...\nAn android client for subscribing to the message stream of gotify/server. The app creates push notifications on newly received messages. ... Google Play and the ... Missing: backend ntfy",
+    "host_name": "gotify.net",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/binwiederhier/ntfy/issues/1018",
+    "name": "Self Hosted ntfy Server with Basic Auth (via Nginx Reverse Proxy",
+    "snippet": "Self Hosted ntfy Server with Basic Auth (via Nginx Reverse Proxy) not supported via Mobile App #1018. New issue.",
+    "host_name": "github.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://homey.app/ko-kr/app/eu.ketra.ntfy",
+    "name": "Ntfy | Homey",
+    "snippet": "NTFY for Homey Send instant push notifications from your Homey smart home hub using NTFY - the simple, self-hosted notification service. What is NTFY?",
+    "host_name": "homey.app",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=wDJDiAYZ3H0",
+    "name": "How to Set Up Ntfy: Self-Hosted Push Notifications Made Easy",
+    "snippet": "Learn how to set up Ntfy, the self-hosted push notification service that keeps you in control of your alerts. Send notifications to your ... Missing: backend 2025\nLearn how to set up Ntfy, the self-hosted push notification service that keeps you in control of your alerts. Send notifications to your ... Missing: backend | Show results with: backend",
+    "host_name": "www.youtube.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://oneuptime.com/blog/post/2026-02-08-how-to-run-ntfy-in-docker-for-push-notifications/view",
+    "name": "How to Run ntfy in Docker for Push Notifications - OneUptime",
+    "snippet": "Set up ntfy in Docker as a self-hosted push notification service with HTTP-based pub/sub and mobile app support.",
+    "host_name": "oneuptime.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://noted.lol/ntfy",
+    "name": "Self-Hosted Push Notifications with Ntfy on iOS - Noted",
+    "snippet": "It lets you send alerts straight to your phone or desktop from any computer using simple scripts, with no sign-ups or fees required. And because ... Missing: free backend",
+    "host_name": "noted.lol",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://dev.to/bunty9/-self-hosted-push-notifications-12g5",
+    "name": "# Self-Hosted Push Notifications Part-1 - DEV Community",
+    "snippet": "This is a complete, production-ready specification for implementing a self-hosted Web Push notification system without relying on third-party ...",
+    "host_name": "dev.to",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]
