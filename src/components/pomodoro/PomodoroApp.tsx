@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { usePomodoroStore } from '@/stores/pomodoro';
 import { notifyTimerComplete, playAlarmSound, triggerVibration, initFCM } from '@/lib/fcm';
@@ -30,18 +30,7 @@ export function PomodoroApp() {
     setFcmStatus,
   } = usePomodoroStore();
 
-  const [hydrated] = useSyncExternalStore(
-    (callback) => {
-      if (usePomodoroStore.persist.hasHydrated()) {
-        return () => {};
-      }
-      const handler = () => callback();
-      usePomodoroStore.persist.onFinishHydration(handler);
-      return () => {};
-    },
-    () => usePomodoroStore.persist.hasHydrated(),
-    () => false
-  );
+  const fcmInitRef = useRef(false);
 
   const prevCompletedRef = useRef(completedWorkSessions);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -105,9 +94,12 @@ export function PomodoroApp() {
     prevCompletedRef.current = completedWorkSessions;
   }, [completedWorkSessions]);
 
-  // Auto-init FCM when stored config is available after hydration
+  // Auto-init FCM once after mount when stored config is available
+  // (Zustand persist hydrates from localStorage before first render on client)
   useEffect(() => {
-    if (!hydrated) return;
+    if (fcmInitRef.current) return;
+    fcmInitRef.current = true;
+
     const isConfigured =
       !!firebaseConfig.apiKey && !!firebaseConfig.projectId && !!firebaseConfig.vapidKey;
     if (isConfigured && fcmStatus === 'disconnected') {
@@ -116,7 +108,7 @@ export function PomodoroApp() {
         .then(() => setFcmStatus('connected'))
         .catch(() => setFcmStatus('error'));
     }
-  }, [hydrated, firebaseConfig.apiKey, firebaseConfig.projectId, firebaseConfig.vapidKey, fcmStatus, setFcmStatus]);
+  });
 
   // Register service worker
   useEffect(() => {
