@@ -161,7 +161,7 @@ export function PomodoroApp() {
             <button
               key={tab.key}
               onClick={() => handleModeSwitch(tab.key)}
-              className={`relative px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+              className={`relative px-6 py-3 rounded-lg text-sm font-medium transition-all duration-200 min-h-[44px] ${
                 mode === tab.key
                   ? 'text-foreground'
                   : 'text-muted-foreground hover:text-foreground/70'
