@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useCallback, useState, useSyncExternalStore } from 'react';
 import { motion } from 'framer-motion';
 import { BellRing } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -8,30 +8,46 @@ import { requestNotificationPermission } from '@/lib/fcm';
 
 type NotificationStatus = 'default' | 'granted' | 'denied' | 'unsupported' | 'loading';
 
-function getPermissionStatus(): NotificationStatus {
+// --- External store for Notification.permission ---
+const listeners = new Set<() => void>();
+
+function subscribePermission(callback: () => void) {
+  listeners.add(callback);
+  return () => { listeners.delete(callback); };
+}
+
+function getPermissionSnapshot(): NotificationStatus {
   if (typeof window === 'undefined') return 'loading';
   if (!('Notification' in window)) return 'unsupported';
   return Notification.permission;
 }
 
-export function NotificationBanner() {
-  const [permission, setPermission] = useState<NotificationStatus>('loading');
+function getServerSnapshot(): NotificationStatus {
+  return 'loading';
+}
 
-  // Read permission only on client after mount to avoid hydration mismatch
-  useEffect(() => {
-    setPermission(getPermissionStatus());
-  }, []);
+function notifyPermissionListeners() {
+  listeners.forEach((cb) => cb());
+}
+
+export function NotificationBanner() {
+  const permission = useSyncExternalStore(
+    subscribePermission,
+    getPermissionSnapshot,
+    getServerSnapshot
+  );
+
   const [dismissed, setDismissed] = useState(false);
 
   const handleRequestPermission = useCallback(async () => {
     try {
-      const result = await requestNotificationPermission();
-      setPermission(result);
-      if (result === 'granted') {
+      await requestNotificationPermission();
+      notifyPermissionListeners(); // trigger re-render to pick up new permission
+      if (typeof window !== 'undefined' && Notification.permission === 'granted') {
         setTimeout(() => setDismissed(true), 2000);
       }
     } catch {
-      setPermission('unsupported');
+      notifyPermissionListeners();
     }
   }, []);
 

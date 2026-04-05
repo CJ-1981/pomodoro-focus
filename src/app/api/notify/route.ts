@@ -2,16 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const { title, body, token } = await request.json();
+    const { title, body, token, serverKey } = await request.json();
 
-    // If Firebase is configured with server key, send via FCM
-    if (process.env.FIREBASE_SERVER_KEY && token) {
+    const key = serverKey || process.env.FIREBASE_SERVER_KEY;
+
+    if (key && token) {
       const response = await fetch(
         `https://fcm.googleapis.com/fcm/send`,
         {
           method: 'POST',
           headers: {
-            Authorization: `key=${process.env.FIREBASE_SERVER_KEY}`,
+            Authorization: `key=${key}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({

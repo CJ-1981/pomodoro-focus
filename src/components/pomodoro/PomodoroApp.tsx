@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useSyncExternalStore } from 'react';
 import { motion } from 'framer-motion';
 import { usePomodoroStore } from '@/stores/pomodoro';
-import { notifyTimerComplete, playAlarmSound, triggerVibration } from '@/lib/fcm';
+import { notifyTimerComplete, playAlarmSound, triggerVibration, initFCM } from '@/lib/fcm';
 import { CircularTimer } from './CircularTimer';
 import { TimerControls } from './TimerControls';
 import { SessionTracker } from './SessionTracker';
@@ -22,10 +22,26 @@ export function PomodoroApp() {
     timerState,
     settings,
     completedWorkSessions,
+    firebaseConfig,
+    fcmStatus,
     switchMode,
     startTimer,
     tick,
+    setFcmStatus,
   } = usePomodoroStore();
+
+  const [hydrated] = useSyncExternalStore(
+    (callback) => {
+      if (usePomodoroStore.persist.hasHydrated()) {
+        return () => {};
+      }
+      const handler = () => callback();
+      usePomodoroStore.persist.onFinishHydration(handler);
+      return () => {};
+    },
+    () => usePomodoroStore.persist.hasHydrated(),
+    () => false
+  );
 
   const prevCompletedRef = useRef(completedWorkSessions);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -88,6 +104,19 @@ export function PomodoroApp() {
   useEffect(() => {
     prevCompletedRef.current = completedWorkSessions;
   }, [completedWorkSessions]);
+
+  // Auto-init FCM when stored config is available after hydration
+  useEffect(() => {
+    if (!hydrated) return;
+    const isConfigured =
+      !!firebaseConfig.apiKey && !!firebaseConfig.projectId && !!firebaseConfig.vapidKey;
+    if (isConfigured && fcmStatus === 'disconnected') {
+      setFcmStatus('connecting');
+      initFCM(firebaseConfig)
+        .then(() => setFcmStatus('connected'))
+        .catch(() => setFcmStatus('error'));
+    }
+  }, [hydrated, firebaseConfig.apiKey, firebaseConfig.projectId, firebaseConfig.vapidKey, fcmStatus, setFcmStatus]);
 
   // Register service worker
   useEffect(() => {

@@ -3,6 +3,29 @@ import { persist } from 'zustand/middleware';
 
 type TimerMode = 'work' | 'shortBreak' | 'longBreak';
 type TimerState = 'idle' | 'running' | 'paused' | 'completed';
+type FcmStatus = 'disconnected' | 'connecting' | 'connected' | 'error';
+
+export interface FirebaseConfig {
+  apiKey: string;
+  authDomain: string;
+  projectId: string;
+  storageBucket: string;
+  messagingSenderId: string;
+  appId: string;
+  vapidKey: string;
+  serverKey: string;
+}
+
+export const DEFAULT_FIREBASE_CONFIG: FirebaseConfig = {
+  apiKey: '',
+  authDomain: '',
+  projectId: '',
+  storageBucket: '',
+  messagingSenderId: '',
+  appId: '',
+  vapidKey: '',
+  serverKey: '',
+};
 
 export interface PomodoroSettings {
   workDuration: number; // minutes
@@ -31,6 +54,10 @@ interface PomodoroState {
   // Settings
   settings: PomodoroSettings;
 
+  // Firebase / FCM
+  firebaseConfig: FirebaseConfig;
+  fcmStatus: FcmStatus;
+
   // Actions
   startTimer: () => void;
   pauseTimer: () => void;
@@ -40,6 +67,8 @@ interface PomodoroState {
   timerComplete: () => void;
   updateRemaining: () => void;
   updateSettings: (settings: Partial<PomodoroSettings>) => void;
+  updateFirebaseConfig: (config: Partial<FirebaseConfig>) => void;
+  setFcmStatus: (status: FcmStatus) => void;
   tick: () => void; // Called every second
   resetDayStats: () => void;
 }
@@ -75,6 +104,8 @@ export const usePomodoroStore = create<PomodoroState>()(
       completedWorkSessions: 0,
       totalCompletedToday: 0,
       settings: DEFAULT_SETTINGS,
+      firebaseConfig: DEFAULT_FIREBASE_CONFIG,
+      fcmStatus: 'disconnected' as FcmStatus,
 
       startTimer: () => {
         const { mode, settings } = get();
@@ -172,6 +203,16 @@ export const usePomodoroStore = create<PomodoroState>()(
         }
       },
 
+      updateFirebaseConfig: (newConfig) => {
+        const { firebaseConfig } = get();
+        const merged = { ...firebaseConfig, ...newConfig };
+        set({ firebaseConfig: merged, fcmStatus: 'disconnected' as FcmStatus });
+      },
+
+      setFcmStatus: (status) => {
+        set({ fcmStatus: status });
+      },
+
       tick: () => {
         const { timerState } = get();
         if (timerState === 'running') {
@@ -192,6 +233,7 @@ export const usePomodoroStore = create<PomodoroState>()(
         completedWorkSessions: state.completedWorkSessions,
         totalCompletedToday: state.totalCompletedToday,
         settings: state.settings,
+        firebaseConfig: state.firebaseConfig,
       }),
     }
   )

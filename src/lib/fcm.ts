@@ -1,4 +1,9 @@
-import { isFirebaseConfigured, firebaseConfig } from './firebase';
+import type { FirebaseConfig } from '@/stores/pomodoro';
+import {
+  getFirebaseClientConfig,
+  isFirebaseConfigured,
+  cacheFirebaseConfigForSW,
+} from './firebase';
 
 export async function requestNotificationPermission(): Promise<NotificationPermission> {
   if (!('Notification' in window)) {
@@ -13,11 +18,14 @@ export function hasNotificationPermission(): boolean {
   return 'Notification' in window && Notification.permission === 'granted';
 }
 
-// Initialize FCM if Firebase is configured
-export async function initFCM(): Promise<string | null> {
+/**
+ * Initialize FCM using config from the store (localStorage).
+ * Returns the FCM token on success, null otherwise.
+ */
+export async function initFCM(config: FirebaseConfig): Promise<string | null> {
   if (typeof window === 'undefined') return null;
 
-  if (!isFirebaseConfigured()) {
+  if (!isFirebaseConfigured(config)) {
     console.warn('Firebase not configured. Using local notifications.');
     return null;
   }
@@ -26,12 +34,25 @@ export async function initFCM(): Promise<string | null> {
     const { initializeApp } = await import('firebase/app');
     const { getMessaging, getToken } = await import('firebase/messaging');
 
-    const app = initializeApp(firebaseConfig);
+    const clientConfig = getFirebaseClientConfig(config);
+    const app = initializeApp(clientConfig, 'pomodoro-fcm');
     const messaging = getMessaging(app);
 
     const token = await getToken(messaging, {
-      vapidKey: firebaseConfig.vapidKey,
+      vapidKey: config.vapidKey,
+      serviceWorkerRegistration: await navigator.serviceWorker.ready,
     });
+
+    // Cache config for service worker background messaging
+    await cacheFirebaseConfigForSW(config);
+
+    // Notify service worker about the new config
+    if (navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({
+        type: 'FIREBASE_CONFIG',
+        config: clientConfig,
+      });
+    }
 
     // Send token to our API
     await fetch('/api/fcm-token', {
@@ -40,10 +61,11 @@ export async function initFCM(): Promise<string | null> {
       body: JSON.stringify({ token }),
     });
 
+    console.log('FCM initialized successfully. Token:', token.substring(0, 20) + '...');
     return token;
   } catch (error) {
     console.error('FCM initialization failed:', error);
-    return null;
+    throw error;
   }
 }
 
