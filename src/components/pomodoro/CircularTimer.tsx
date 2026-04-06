@@ -11,7 +11,6 @@ const MODE_LABELS = {
 
 export function CircularTimer() {
   const { mode, remainingMs, totalTime, timerState } = usePomodoroStore();
-  const progress = totalTime > 0 ? 1 - remainingMs / totalTime : 0;
 
   const minutes = Math.floor(remainingMs / 60000);
   const seconds = Math.floor((remainingMs % 60000) / 1000);
@@ -20,10 +19,15 @@ export function CircularTimer() {
   // Responsive timer size: 340px on larger screens, fits within viewport on small ones
   // We use CSS max-w to constrain, but keep size=340 for SVG viewBox calculations
   const size = 280;
-  const strokeWidth = 6;
+  const strokeWidth = 12; // Thicker lines as requested
+  const bgStrokeWidth = 8; // Slightly thinner background line
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference * (1 - progress);
+  
+  // As time lapses (remainingMs decreases), the circle should get shorter.
+  // Full circle (offset=0) at start, empty circle (offset=circumference) at end.
+  const remainingProgress = totalTime > 0 ? remainingMs / totalTime : 0;
+  const strokeDashoffset = circumference * (1 - remainingProgress);
 
   const isCompleted = timerState === 'completed';
   const isRunning = timerState === 'running';
@@ -71,8 +75,8 @@ export function CircularTimer() {
           cy={size / 2}
           r={radius}
           fill="none"
-          className="stroke-muted"
-          strokeWidth={strokeWidth}
+          className="stroke-muted/30"
+          strokeWidth={bgStrokeWidth}
         />
 
         {/* Progress circle */}
@@ -85,9 +89,9 @@ export function CircularTimer() {
           strokeWidth={strokeWidth}
           strokeLinecap="round"
           strokeDasharray={circumference}
-          initial={{ strokeDashoffset: circumference }}
+          initial={{ strokeDashoffset: 0 }}
           animate={{ strokeDashoffset }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
+          transition={{ duration: 0.5, ease: 'linear' }}
         />
       </motion.svg>
 
