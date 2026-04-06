@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePomodoroStore } from '@/stores/pomodoro';
+import { SessionStatsDialog } from './SessionStatsDialog';
 
 export function SessionTracker() {
   const {
@@ -65,7 +66,7 @@ export function SessionTracker() {
 
       {completedWorkSessions > 0 && (
         <motion.div
-          className="text-center"
+          className="flex items-center justify-center gap-1"
           initial={{ opacity: 0, y: -5 }}
           animate={{ opacity: 1, y: 0 }}
         >
@@ -76,6 +77,7 @@ export function SessionTracker() {
             </span>{' '}
             sessions
           </span>
+          <SessionStatsDialog />
         </motion.div>
       )}
     </div>

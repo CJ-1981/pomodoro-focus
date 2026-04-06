@@ -24,6 +24,7 @@ export function PomodoroApp() {
     mode,
     timerState,
     settings,
+    modeStates,
     completedWorkSessions,
     lastCompletedMode,
     firebaseConfig,
