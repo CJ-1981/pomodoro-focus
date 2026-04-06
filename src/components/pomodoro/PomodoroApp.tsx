@@ -217,35 +217,37 @@ export function PomodoroApp() {
 
       {/* Main Content — Scrollable if content exceeds viewport height */}
       <motion.main
-        className="flex-1 flex flex-col items-center px-5 py-2 sm:py-4 gap-4 sm:gap-6 min-h-0 overflow-y-auto overflow-x-hidden scrollbar-none touch-pan-y"
+        className="flex-1 flex flex-col items-center px-5 min-h-0 overflow-y-auto overflow-x-hidden scrollbar-none touch-pan-y"
         onPanEnd={handleSwipe}
       >
-        {/* Container to maintain centering when scrolling is not needed */}
-        <div className="flex-1 flex flex-col items-center justify-center gap-4 sm:gap-6 py-2 sm:py-4 w-full max-w-md mx-auto pointer-events-none">
-          <div className="pointer-events-auto flex flex-col items-center gap-4 sm:gap-6 w-full">
-            {/* Circular Timer */}
-            <CircularTimer />
+        <div className="flex-1 w-full max-w-md mx-auto flex flex-col items-center gap-4 py-2 sm:py-4 scale-95 origin-top">
+          {/* Container to maintain centering when scrolling is not needed */}
+          <div className="flex-1 flex flex-col items-center justify-center gap-4 sm:gap-6 w-full pointer-events-none">
+            <div className="pointer-events-auto flex flex-col items-center gap-4 sm:gap-6 w-full">
+              {/* Circular Timer */}
+              <CircularTimer />
 
-            {/* Controls */}
-            <TimerControls />
+              {/* Controls */}
+              <TimerControls />
 
-            {/* Session Tracker */}
-            <SessionTracker />
+              {/* Session Tracker */}
+              <SessionTracker />
+            </div>
           </div>
-        </div>
 
-        {/* Bottom Elements — scrollable part of the main view */}
-        <div className="w-full max-w-md mx-auto flex flex-col items-center gap-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
-          <NotificationBanner />
-          <a
-            href="https://github.com/CJ-1981/pomodoro-focus"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-[10px] font-medium text-muted-foreground/40 hover:text-foreground transition-colors py-1"
-          >
-            <Github className="h-3 w-3" />
-            <span>GitHub</span>
-          </a>
+          {/* Bottom Elements — scrollable part of the main view */}
+          <div className="w-full flex flex-col items-center gap-4 pb-[calc(env(safe-area-inset-bottom)+0.5rem)]">
+            <NotificationBanner />
+            <a
+              href="https://github.com/CJ-1981/pomodoro-focus"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-[10px] font-medium text-muted-foreground/40 hover:text-foreground transition-colors py-1"
+            >
+              <Github className="h-3 w-3" />
+              <span>GitHub</span>
+            </a>
+          </div>
         </div>
       </motion.main>
     </div>
