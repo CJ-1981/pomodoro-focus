@@ -88,7 +88,7 @@ export function PWAInstallPrompt() {
         >
           <div className="flex justify-between items-start mb-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-pomodoro-work flex items-center justify-center text-xl shadow-sm">
+              <div className="w-10 h-10 rounded-xl bg-pomodoro-work flex flex-shrink-0 items-center justify-center text-xl shadow-sm">
                 🍅
               </div>
               <div>

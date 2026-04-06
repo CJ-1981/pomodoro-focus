@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   description: "A beautiful Pomodoro timer to boost your productivity. Track focus sessions, take breaks, and stay productive.",
   keywords: ["pomodoro", "timer", "productivity", "focus", "pomodoro technique"],
   authors: [{ name: "Pomodoro Timer" }],
-  manifest: "manifest.json",
+  manifest: "./manifest.json",
   icons: {
     icon: [
       { url: "favicon.svg", type: "image/svg+xml" },
@@ -59,6 +59,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="manifest" href="./manifest.json" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
