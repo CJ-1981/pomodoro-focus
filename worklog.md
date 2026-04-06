@@ -163,6 +163,8 @@ Work Log:
 - **New Features:**
     - **Session Stats:** Created `SessionStatsDialog` with a detailed daily summary and a "Copy to Markdown" feature for easy productivity logging.
     - **Settings:** Added a "Reset to Defaults" button to quickly restore all timer and automation settings.
+    - **FCM Accessibility:** Added direct links to the Firebase Console and Setup Guide within the settings dialog for easier background notification configuration.
+    - **PWA Installation:** Implemented a smart `PWAInstallPrompt` that provides OS-specific instructions (iOS Safari guided prompt vs. Android/Chrome direct install button).
 - **Stability & Bug Fixes:**
     - Fixed `ReferenceError: modeStates is not defined` in `PomodoroApp.tsx`.
     - Fixed `strokeDashoffset` animation warning in `CircularTimer.tsx` by providing initial values.

@@ -17,6 +17,7 @@ import {
   XCircle,
   Wifi,
   WifiOff,
+  ExternalLink,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -311,11 +312,33 @@ export function SettingsSheet() {
               )}
             </CollapsibleTrigger>
 
-            <CollapsibleContent className="mt-3 space-y-2.5">
-              <p className="text-[11px] text-muted-foreground/70 leading-relaxed">
-                Enter your Firebase project credentials to enable push notifications that work even when
-                the app is in the background. All values are stored locally on your device.
-              </p>
+            <CollapsibleContent className="mt-3 space-y-3">
+              <div className="space-y-2">
+                <p className="text-[11px] text-muted-foreground/70 leading-relaxed">
+                  Enter your Firebase project credentials to enable push notifications that work even when
+                  the app is in the background. All values are stored locally on your device.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <a
+                    href="https://console.firebase.google.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-[10px] font-medium text-pomodoro-long hover:underline"
+                  >
+                    <ExternalLink className="h-2.5 w-2.5" />
+                    Firebase Console
+                  </a>
+                  <a
+                    href="https://github.com/CJ-1981/pomodoro-focus#%EF%B8%8F-background-notifications-fcm"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-[10px] font-medium text-pomodoro-long hover:underline"
+                  >
+                    <ExternalLink className="h-2.5 w-2.5" />
+                    Setup Guide
+                  </a>
+                </div>
+              </div>
 
               {FIREBASE_FIELDS.map((field) => (
                 <div key={field.key} className="space-y-1">

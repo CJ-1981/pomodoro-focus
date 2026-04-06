@@ -12,6 +12,7 @@ import { SessionTracker } from './SessionTracker';
 import { SettingsSheet } from './SettingsSheet';
 import { NotificationBanner } from './NotificationBanner';
 import { ThemeToggle } from './ThemeToggle';
+import { PWAInstallPrompt } from './PWAInstallPrompt';
 
 const MODE_TABS = [
   { key: 'work' as const, label: 'Focus' },
@@ -290,6 +291,8 @@ export function PomodoroApp() {
           </div>
         </div>
       </motion.main>
+
+      <PWAInstallPrompt />
     </div>
   );
 }
