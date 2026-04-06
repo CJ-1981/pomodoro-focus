@@ -48,7 +48,7 @@ export function PWAInstallPrompt() {
 
     // 4. Handle iOS Safari
     if (isIos && isSafari) {
-      setPlatform('ios');
+      setTimeout(() => setPlatform('ios'), 0);
       const hasDismissed = localStorage.getItem('pwa-prompt-dismissed');
       if (!hasDismissed) {
         setTimeout(() => setShowPrompt(true), 3000);

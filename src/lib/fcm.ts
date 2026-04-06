@@ -40,11 +40,14 @@ export async function initFCM(config: FirebaseConfig): Promise<string | null> {
   }
 
   try {
-    const { initializeApp } = await import('firebase/app');
+    const { initializeApp, getApps, getApp } = await import('firebase/app');
     const { getMessaging, getToken } = await import('firebase/messaging');
 
     const clientConfig = getFirebaseClientConfig(config);
-    const app = initializeApp(clientConfig, 'pomodoro-fcm');
+    const appName = 'pomodoro-fcm';
+    const app = getApps().find((a) => a.name === appName) 
+      ? getApp(appName) 
+      : initializeApp(clientConfig, appName);
     const messaging = getMessaging(app);
 
     const token = await getToken(messaging, {

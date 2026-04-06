@@ -70,6 +70,7 @@ interface PomodoroState {
   // Firebase / FCM
   firebaseConfig: FirebaseConfig;
   fcmStatus: FcmStatus;
+  _hasHydrated: boolean;
 
   // Actions
   startTimer: () => void;
@@ -148,6 +149,7 @@ export const usePomodoroStore = create<PomodoroState>()(
       settings: DEFAULT_SETTINGS,
       firebaseConfig: DEFAULT_FIREBASE_CONFIG,
       fcmStatus: 'disconnected' as FcmStatus,
+      _hasHydrated: false,
 
       startTimer: () => {
         const { mode, settings, modeStates } = get();
@@ -440,7 +442,10 @@ export const usePomodoroStore = create<PomodoroState>()(
       name: 'pomodoro-storage',
       onRehydrateStorage: (state) => {
         return (hydratedState, error) => {
-          if (error || !hydratedState) return;
+          if (error || !hydratedState) {
+            state._hasHydrated = true;
+            return;
+          }
 
           // Check if timer was running when app closed
           if (hydratedState.timerState === 'running' && hydratedState.endTime) {
@@ -455,6 +460,8 @@ export const usePomodoroStore = create<PomodoroState>()(
               hydratedState.remainingMs = remaining;
             }
           }
+
+          hydratedState._hasHydrated = true;
         };
       },
       partialize: (state) => ({

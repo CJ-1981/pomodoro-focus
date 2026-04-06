@@ -30,6 +30,7 @@ export function PomodoroApp() {
     lastCompletedMode,
     firebaseConfig,
     fcmStatus,
+    _hasHydrated,
     switchMode,
     startTimer,
     tick,
@@ -118,18 +119,28 @@ export function PomodoroApp() {
 
   // Auto-init FCM once after mount when stored config is available
   useEffect(() => {
-    if (fcmInitRef.current) return;
+    if (!_hasHydrated || fcmInitRef.current) return;
+    
+    // Once hydrated, we take our one shot at auto-reconnect
     fcmInitRef.current = true;
 
     const isConfigured =
       !!firebaseConfig.apiKey && !!firebaseConfig.projectId && !!firebaseConfig.vapidKey;
+    
     if (isConfigured && fcmStatus === 'disconnected') {
+      logger.log('[PomodoroApp] Auto-reconnecting FCM...');
       setFcmStatus('connecting');
       initFCM(firebaseConfig)
-        .then(() => setFcmStatus('connected'))
-        .catch(() => setFcmStatus('error'));
+        .then(() => {
+          logger.log('[PomodoroApp] FCM reconnected successfully.');
+          setFcmStatus('connected');
+        })
+        .catch((error) => {
+          logger.warn('[PomodoroApp] FCM reconnection failed:', error);
+          setFcmStatus('error');
+        });
     }
-  });
+  }, [_hasHydrated, firebaseConfig, fcmStatus, setFcmStatus]);
 
   // Register service worker
   useEffect(() => {
