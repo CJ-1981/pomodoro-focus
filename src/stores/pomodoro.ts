@@ -352,26 +352,30 @@ export const usePomodoroStore = create<PomodoroState>()(
         const { mode, timerState, settings, modeStates } = get();
         const merged = { ...settings, ...newSettings };
         
-        // Update all mode durations in modeStates if they are currently idle
+        // Update all mode durations in modeStates if they are currently not running
         const updatedModeStates = { ...modeStates };
         (Object.keys(updatedModeStates) as TimerMode[]).forEach((m) => {
-          if (updatedModeStates[m].timerState === 'idle') {
+          if (updatedModeStates[m].timerState === 'idle' || updatedModeStates[m].timerState === 'completed') {
             const duration = getDurationForMode(m, merged);
             updatedModeStates[m] = {
               ...updatedModeStates[m],
+              timerState: 'idle', // Reset completed state to idle when duration changes
               remainingMs: duration,
               totalTime: duration,
+              endTime: null,
             };
           }
         });
 
-        // If current timer is idle, update top-level remaining time too
-        if (timerState === 'idle') {
+        // If current timer is not running, update top-level state too
+        if (timerState === 'idle' || timerState === 'completed') {
           const duration = getDurationForMode(mode, merged);
           set({ 
             settings: merged, 
+            timerState: 'idle',
             remainingMs: duration, 
             totalTime: duration,
+            endTime: null,
             modeStates: updatedModeStates,
           });
         } else {

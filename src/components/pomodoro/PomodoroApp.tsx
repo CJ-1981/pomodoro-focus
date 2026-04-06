@@ -217,12 +217,12 @@ export function PomodoroApp() {
 
       {/* Main Content — Scrollable if content exceeds viewport height */}
       <motion.main
-        className="flex-1 flex flex-col items-center justify-center px-5 py-4 gap-6 min-h-0 overflow-y-auto overflow-x-hidden scrollbar-none touch-pan-y"
+        className="flex-1 flex flex-col items-center justify-center px-5 py-2 sm:py-4 gap-4 sm:gap-6 min-h-0 overflow-y-auto overflow-x-hidden scrollbar-none touch-pan-y"
         onPanEnd={handleSwipe}
       >
         {/* Container to maintain centering when scrolling is not needed */}
-        <div className="flex flex-col items-center justify-center gap-6 py-4 w-full max-w-md mx-auto pointer-events-none">
-          <div className="pointer-events-auto flex flex-col items-center gap-6 w-full">
+        <div className="flex flex-col items-center justify-center gap-4 sm:gap-6 py-2 sm:py-4 w-full max-w-md mx-auto pointer-events-none">
+          <div className="pointer-events-auto flex flex-col items-center gap-4 sm:gap-6 w-full">
             {/* Circular Timer */}
             <CircularTimer />
 
@@ -236,13 +236,13 @@ export function PomodoroApp() {
       </motion.main>
 
       {/* Footer */}
-      <footer className="px-5 pb-[calc(env(safe-area-inset-bottom)+1.25rem)] pt-2 flex-shrink-0 bg-background/80 backdrop-blur-sm flex flex-col items-center gap-3">
+      <footer className="px-5 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-1 flex-shrink-0 bg-background/80 backdrop-blur-sm flex flex-col items-center gap-2">
         <NotificationBanner />
         <a
           href="https://github.com/CJ-1981/pomodoro-focus"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground/60 hover:text-foreground transition-colors py-0.5"
+          className="flex items-center gap-1.5 text-[10px] font-medium text-muted-foreground/50 hover:text-foreground transition-colors py-0.5"
         >
           <Github className="h-3 w-3" />
           <span>GitHub</span>

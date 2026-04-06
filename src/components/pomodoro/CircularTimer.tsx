@@ -33,16 +33,26 @@ export function CircularTimer() {
   const isRunning = timerState === 'running';
 
   // Compute actual stroke color based on mode
-  const getStrokeColor = () => {
+  const getStrokeClass = () => {
     switch (mode) {
-      case 'work': return 'var(--pomodoro-work)';
-      case 'shortBreak': return 'var(--pomodoro-short)';
-      case 'longBreak': return 'var(--pomodoro-long)';
-      default: return 'var(--pomodoro-work)';
+      case 'work': return 'stroke-pomodoro-work';
+      case 'shortBreak': return 'stroke-pomodoro-short';
+      case 'longBreak': return 'stroke-pomodoro-long';
+      default: return 'stroke-pomodoro-work';
     }
   };
 
-  const strokeColor = getStrokeColor();
+  const getTextColorClass = () => {
+    switch (mode) {
+      case 'work': return 'text-pomodoro-work';
+      case 'shortBreak': return 'text-pomodoro-short';
+      case 'longBreak': return 'text-pomodoro-long';
+      default: return 'text-pomodoro-work';
+    }
+  };
+
+  const strokeClass = getStrokeClass();
+  const textColorClass = getTextColorClass();
 
   return (
     <div className="relative flex items-center justify-center w-full max-w-[300px] aspect-square">
@@ -53,9 +63,9 @@ export function CircularTimer() {
           width: '100%',
           height: '100%',
           boxShadow: isRunning
-            ? `0 0 60px -10px ${strokeColor}`
+            ? `0 0 60px -10px var(--pomodoro-${mode})`
             : 'none',
-          opacity: isRunning ? 0.15 : 0,
+          opacity: isRunning ? 0.2 : 0,
           transition: 'opacity 0.5s ease, box-shadow 0.5s ease',
         }}
       />
@@ -75,7 +85,7 @@ export function CircularTimer() {
           cy={size / 2}
           r={radius}
           fill="none"
-          className="stroke-muted/30"
+          className="stroke-muted/40"
           strokeWidth={bgStrokeWidth}
         />
 
@@ -85,11 +95,10 @@ export function CircularTimer() {
           cy={size / 2}
           r={radius}
           fill="none"
-          style={{ stroke: strokeColor }}
+          className={strokeClass}
           strokeWidth={strokeWidth}
           strokeLinecap="round"
-          strokeDasharray={circumference}
-          initial={{ strokeDashoffset: 0 }}
+          strokeDasharray={`${circumference} ${circumference}`}
           animate={{ strokeDashoffset }}
           transition={{ duration: 0.5, ease: 'linear' }}
         />
@@ -98,8 +107,7 @@ export function CircularTimer() {
       {/* Center content */}
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <motion.span
-          className="text-xs font-medium tracking-[0.2em] uppercase mb-2"
-          style={{ color: strokeColor }}
+          className={`text-xs font-medium tracking-[0.2em] uppercase mb-2 ${textColorClass}`}
           key={mode}
           initial={{ opacity: 0, y: -5 }}
           animate={{ opacity: 1, y: 0 }}
@@ -131,8 +139,7 @@ export function CircularTimer() {
 
         {isCompleted && (
           <motion.span
-            className="text-xs mt-3 font-semibold"
-            style={{ color: strokeColor }}
+            className={`text-xs mt-3 font-semibold ${textColorClass}`}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, type: 'spring' }}
