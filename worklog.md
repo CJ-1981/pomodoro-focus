@@ -155,11 +155,11 @@ Work Log:
 - **Audio & Media:**
     - Created mode-specific audio patterns (Energetic for Focus, Gentle for Short Break, Celebratory for Long Break).
     - Fixed browser `AudioContext` autoplay restrictions by implementing a singleton context that resumes on the first user interaction (`onClick` on root container).
-- **UI & Layout Optimizations:**
-    - Removed fixed footer to maximize vertical space; moved GitHub link and notifications into the scrollable main area.
-    - Scaled the main view down by 5% (`scale-95`) and refined gaps to ensure a zero-scroll experience on small devices like iPhone SE (667px height).
+- **PWA & Assets:**
+    - Created high-quality SVG app icons and favicon using the tomato emoji.
+    - Generated optimized PNG versions (180x180, 192x192, 512x512) using `sharp` to ensure iOS Safari compatibility for the PWA home screen icon.
+    - Updated `layout.tsx` and `manifest.json` to correctly reference PNG assets for Apple Touch Icon.
     - Hidden scrollbars on mobile via global CSS utility for a cleaner, native-app feel.
-    - Created high-quality SVG app icons and favicon using the tomato emoji for better cross-platform visual consistency.
 - **New Features:**
     - **Session Stats:** Created `SessionStatsDialog` with a detailed daily summary and a "Copy to Markdown" feature for easy productivity logging.
     - **Settings:** Added a "Reset to Defaults" button to quickly restore all timer and automation settings.
