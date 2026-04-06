@@ -19,14 +19,14 @@ export const metadata: Metadata = {
   description: "A beautiful Pomodoro timer to boost your productivity. Track focus sessions, take breaks, and stay productive.",
   keywords: ["pomodoro", "timer", "productivity", "focus", "pomodoro technique"],
   authors: [{ name: "Pomodoro Timer" }],
-  manifest: "/manifest.json",
+  manifest: "manifest.json",
   icons: {
     icon: [
-      { url: "/favicon.svg", type: "image/svg+xml" },
-      { url: "/favicon.png", type: "image/png" },
-      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "favicon.svg", type: "image/svg+xml" },
+      { url: "favicon.png", type: "image/png" },
+      { url: "icons/icon-192.png", sizes: "192x192", type: "image/png" },
     ],
-    apple: "/icons/icon-180.png",
+    apple: "icons/apple-touch-icon.png",
   },
   appleWebApp: {
     capable: true,
@@ -59,13 +59,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <link rel="manifest" href="/manifest.json" />
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/icons/icon-180.png" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
