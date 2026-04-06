@@ -90,10 +90,24 @@ export function sendLocalNotification(title: string, body: string, tag: string =
   });
 }
 
+let audioContext: AudioContext | null = null;
+
+export function resumeAudioContext() {
+  if (typeof window === 'undefined') return;
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+  }
+  if (audioContext.state === 'suspended') {
+    audioContext.resume();
+  }
+  return audioContext;
+}
+
 // Alarm sound using Web Audio API
 export function playAlarmSound(mode: 'work' | 'shortBreak' | 'longBreak' = 'work') {
   try {
-    const ctx = new AudioContext();
+    const ctx = resumeAudioContext();
+    if (!ctx) return;
 
     const playBeep = (time: number, freq: number, duration: number, volume = 0.3, type: OscillatorType = 'sine') => {
       const osc = ctx.createOscillator();
@@ -128,9 +142,6 @@ export function playAlarmSound(mode: 'work' | 'shortBreak' | 'longBreak' = 'work
       playBeep(now + 0.2, baseFreq * 1.25, 0.5, 0.3, 'triangle'); // G#4
       playBeep(now + 0.4, baseFreq * 1.5, 0.8, 0.3, 'triangle'); // B4
     }
-
-    // Clean up
-    setTimeout(() => ctx.close(), 4000);
   } catch (_e) {
     console.warn('Audio not available');
   }

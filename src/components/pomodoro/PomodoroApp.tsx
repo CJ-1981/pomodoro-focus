@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Github } from 'lucide-react';
 import { usePomodoroStore } from '@/stores/pomodoro';
 import { logger } from '@/lib/logger';
-import { notifyTimerComplete, playAlarmSound, triggerVibration, initFCM } from '@/lib/fcm';
+import { notifyTimerComplete, playAlarmSound, triggerVibration, initFCM, resumeAudioContext } from '@/lib/fcm';
 import { CircularTimer } from './CircularTimer';
 import { TimerControls } from './TimerControls';
 import { SessionTracker } from './SessionTracker';
@@ -66,8 +66,9 @@ export function PomodoroApp() {
 
   // Watch for timer completion in any mode
   useEffect(() => {
-    Object.entries(usePomodoroStore.getState().modeStates).forEach(([m, state]) => {
-      const modeKey = m as keyof typeof modeStates;
+    const states = usePomodoroStore.getState().modeStates;
+    Object.entries(states).forEach(([m, state]) => {
+      const modeKey = m as keyof typeof states;
       if (
         state.timerState === 'completed' &&
         state.completedAt &&
@@ -185,7 +186,10 @@ export function PomodoroApp() {
   };
 
   return (
-    <div className="fixed inset-0 bg-background text-foreground flex flex-col overflow-hidden">
+    <div 
+      className="fixed inset-0 bg-background text-foreground flex flex-col overflow-hidden"
+      onClick={() => resumeAudioContext()}
+    >
       {/* Header + Mode Tabs */}
       <div className="flex-shrink-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50 border-b border-border/5">
         <header className="flex items-center justify-between px-6 pt-[calc(env(safe-area-inset-top)+1rem)] pb-3">
