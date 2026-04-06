@@ -37,6 +37,11 @@ export function PomodoroApp() {
   const fcmInitRef = useRef(false);
   const prevCompletedRef = useRef(completedWorkSessions);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const lastNotifiedAtRef = useRef<Record<string, number>>({
+    work: 0,
+    shortBreak: 0,
+    longBreak: 0,
+  });
 
   // Main timer tick - runs every 100ms for smooth updates
   useEffect(() => {
@@ -58,37 +63,47 @@ export function PomodoroApp() {
     };
   }, [timerState, tick]);
 
-  // Watch for timer completion
+  // Watch for timer completion in any mode
   useEffect(() => {
-    if (timerState === 'completed') {
-      const currentMode = lastCompletedMode || mode;
-      logger.log(`[PomodoroApp] Timer completed for mode: ${currentMode}. Playing alerts.`);
-
-      if (settings.soundEnabled) playAlarmSound(currentMode);
-      if (settings.vibrationEnabled) triggerVibration();
-      if (settings.notificationsEnabled) {
-        notifyTimerComplete(currentMode);
-      }
-
-      // Auto-start next session if enabled
+    Object.entries(usePomodoroStore.getState().modeStates).forEach(([m, state]) => {
+      const modeKey = m as keyof typeof modeStates;
       if (
-        (mode === 'shortBreak' || mode === 'longBreak') &&
-        settings.autoStartBreaks
+        state.timerState === 'completed' &&
+        state.completedAt &&
+        state.completedAt > lastNotifiedAtRef.current[modeKey]
       ) {
-        logger.log(`[PomodoroApp] Auto-starting break session`);
-        const timeout = setTimeout(() => {
-          startTimer();
-        }, 1500);
-        return () => clearTimeout(timeout);
-      } else if (mode === 'work' && settings.autoStartWork) {
-        logger.log(`[PomodoroApp] Auto-starting work session`);
-        const timeout = setTimeout(() => {
-          startTimer();
-        }, 1500);
-        return () => clearTimeout(timeout);
+        lastNotifiedAtRef.current[modeKey] = state.completedAt;
+        
+        logger.log(`[PomodoroApp] New completion detected for mode: ${modeKey}. Playing alerts.`);
+
+        if (settings.soundEnabled) playAlarmSound(modeKey);
+        if (settings.vibrationEnabled) triggerVibration();
+        if (settings.notificationsEnabled) {
+          notifyTimerComplete(modeKey);
+        }
+
+        // Auto-start next session if this is the active mode
+        if (modeKey === lastCompletedMode || modeKey === mode) {
+          if (
+            (mode === 'shortBreak' || mode === 'longBreak') &&
+            settings.autoStartBreaks
+          ) {
+            logger.log(`[PomodoroApp] Auto-starting break session`);
+            const timeout = setTimeout(() => {
+              startTimer();
+            }, 1500);
+            return () => clearTimeout(timeout);
+          } else if (mode === 'work' && settings.autoStartWork) {
+            logger.log(`[PomodoroApp] Auto-starting work session`);
+            const timeout = setTimeout(() => {
+              startTimer();
+            }, 1500);
+            return () => clearTimeout(timeout);
+          }
+        }
       }
-    }
-  }, [timerState, mode, lastCompletedMode, settings, startTimer]);
+    });
+  }, [modeStates, mode, lastCompletedMode, settings, startTimer]);
 
   // Track completed sessions
   useEffect(() => {

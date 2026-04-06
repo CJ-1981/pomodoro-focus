@@ -45,6 +45,7 @@ interface ModeState {
   endTime: number | null;
   remainingMs: number;
   totalTime: number;
+  completedAt: number | null;
 }
 
 interface PomodoroState {
@@ -113,18 +114,21 @@ function createInitialModeStates(settings: PomodoroSettings): Record<TimerMode, 
       endTime: null,
       remainingMs: settings.workDuration * 60 * 1000,
       totalTime: settings.workDuration * 60 * 1000,
+      completedAt: null,
     },
     shortBreak: {
       timerState: 'idle',
       endTime: null,
       remainingMs: settings.shortBreakDuration * 60 * 1000,
       totalTime: settings.shortBreakDuration * 60 * 1000,
+      completedAt: null,
     },
     longBreak: {
       timerState: 'idle',
       endTime: null,
       remainingMs: settings.longBreakDuration * 60 * 1000,
       totalTime: settings.longBreakDuration * 60 * 1000,
+      completedAt: null,
     },
   };
 }
@@ -264,6 +268,7 @@ export const usePomodoroStore = create<PomodoroState>()(
           endTime: null,
           remainingMs: 0,
           totalTime: completedModeDuration,
+          completedAt: Date.now(),
         };
 
         // Also prepare the next mode if it was idle
@@ -312,6 +317,7 @@ export const usePomodoroStore = create<PomodoroState>()(
                 endTime: null,
                 remainingMs: 0,
                 totalTime: duration,
+                completedAt: now,
               };
               
               // If this was the active mode, we'll trigger timerComplete later
