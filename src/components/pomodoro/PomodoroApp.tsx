@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import { Github } from 'lucide-react';
 import { usePomodoroStore } from '@/stores/pomodoro';
 import { notifyTimerComplete, playAlarmSound, triggerVibration, initFCM } from '@/lib/fcm';
 import { CircularTimer } from './CircularTimer';
@@ -234,8 +235,17 @@ export function PomodoroApp() {
       </motion.main>
 
       {/* Footer */}
-      <footer className="px-5 pb-[calc(env(safe-area-inset-bottom)+1.25rem)] pt-2 flex-shrink-0 bg-background/80 backdrop-blur-sm">
+      <footer className="px-5 pb-[calc(env(safe-area-inset-bottom)+1.25rem)] pt-2 flex-shrink-0 bg-background/80 backdrop-blur-sm flex flex-col items-center gap-3">
         <NotificationBanner />
+        <a
+          href="https://github.com/CJ-1981/pomodoro-focus"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground/60 hover:text-foreground transition-colors py-0.5"
+        >
+          <Github className="h-3 w-3" />
+          <span>GitHub</span>
+        </a>
       </footer>
     </div>
   );
