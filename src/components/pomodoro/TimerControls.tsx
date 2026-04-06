@@ -56,7 +56,7 @@ export function TimerControls() {
   };
 
   const handleSkip = () => {
-    if (settings.soundEnabled) playAlarmSound();
+    if (settings.soundEnabled) playAlarmSound(mode);
     if (settings.vibrationEnabled) triggerVibration();
     if (settings.notificationsEnabled) {
       notifyTimerComplete(mode);

@@ -91,32 +91,46 @@ export function sendLocalNotification(title: string, body: string, tag: string =
 }
 
 // Alarm sound using Web Audio API
-export function playAlarmSound() {
+export function playAlarmSound(mode: 'work' | 'shortBreak' | 'longBreak' = 'work') {
   try {
     const ctx = new AudioContext();
 
-    const playBeep = (time: number, freq: number, duration: number) => {
+    const playBeep = (time: number, freq: number, duration: number, volume = 0.3, type: OscillatorType = 'sine') => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.frequency.value = freq;
-      osc.type = 'sine';
-      gain.gain.setValueAtTime(0.3, time);
+      osc.type = type;
+      gain.gain.setValueAtTime(volume, time);
       gain.gain.exponentialRampToValueAtTime(0.01, time + duration);
       osc.start(time);
       osc.stop(time + duration);
     };
 
     const now = ctx.currentTime;
-    // Play a pleasant ascending pattern
-    for (let i = 0; i < 3; i++) {
-      playBeep(now + i * 0.3, 523.25, 0.2); // C5
-      playBeep(now + i * 0.3 + 0.1, 659.25, 0.2); // E5
+
+    if (mode === 'work') {
+      // Energetic ascending pattern for work completion
+      for (let i = 0; i < 3; i++) {
+        playBeep(now + i * 0.3, 523.25, 0.2); // C5
+        playBeep(now + i * 0.3 + 0.1, 659.25, 0.2); // E5
+        playBeep(now + i * 0.3 + 0.2, 783.99, 0.2); // G5
+      }
+    } else if (mode === 'shortBreak') {
+      // Gentle double-beep for short break completion
+      playBeep(now, 440, 0.4, 0.2); // A4
+      playBeep(now + 0.5, 440, 0.4, 0.2); // A4
+    } else {
+      // Celebratory deeper pattern for long break completion
+      const baseFreq = 329.63; // E4
+      playBeep(now, baseFreq, 0.5, 0.3, 'triangle');
+      playBeep(now + 0.2, baseFreq * 1.25, 0.5, 0.3, 'triangle'); // G#4
+      playBeep(now + 0.4, baseFreq * 1.5, 0.8, 0.3, 'triangle'); // B4
     }
 
     // Clean up
-    setTimeout(() => ctx.close(), 3000);
+    setTimeout(() => ctx.close(), 4000);
   } catch (_e) {
     console.warn('Audio not available');
   }

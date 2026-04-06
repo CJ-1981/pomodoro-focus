@@ -64,7 +64,7 @@ export function PomodoroApp() {
       const currentMode = lastCompletedMode || mode;
       logger.log(`[PomodoroApp] Timer completed for mode: ${currentMode}. Playing alerts.`);
 
-      if (settings.soundEnabled) playAlarmSound();
+      if (settings.soundEnabled) playAlarmSound(currentMode);
       if (settings.vibrationEnabled) triggerVibration();
       if (settings.notificationsEnabled) {
         notifyTimerComplete(currentMode);
