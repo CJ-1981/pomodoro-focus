@@ -15,6 +15,24 @@ A clean, modern, and highly functional Pomodoro timer designed to help you stay 
 - **📱 PWA Ready:** High-quality SVG icons and installable as a progressive web app for a native experience.
 - **⚙️ Customization:** Adjust timer durations and automation settings with a quick "Reset to Defaults" option.
 
+## 🔔 Background Notifications (FCM)
+
+To receive notifications even when the app is in the background or the tab is closed, you can configure **Firebase Cloud Messaging (FCM)**:
+
+1.  **Create a Firebase Project:** Go to the [Firebase Console](https://console.firebase.google.com/) and create a new project.
+2.  **Add a Web App:** Register a new Web App in your project settings.
+3.  **Get Configuration:** Copy the `firebaseConfig` object (includes `apiKey`, `authDomain`, `projectId`, etc.).
+4.  **Generate VAPID Key:** 
+    - In the Firebase Console, go to **Project Settings** > **Cloud Messaging**.
+    - Under **Web configuration**, generate a new **Web Push certificate** key pair. This is your `VAPID Key`.
+5.  **Configure the App:**
+    - Open **Pomodoro Focus**.
+    - Go to **Settings** (⚙️ icon).
+    - Expand the **Push Server (FCM)** section.
+    - Enter your credentials and click **Connect**.
+
+*Note: All credentials are stored locally on your device and never sent to any external server.*
+
 ## 🛠️ Tech Stack
 
 - **Framework:** [Next.js](https://nextjs.org/) (App Router)
