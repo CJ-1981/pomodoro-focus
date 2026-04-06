@@ -60,6 +60,7 @@ export function PomodoroApp() {
   useEffect(() => {
     if (timerState === 'completed') {
       const currentMode = lastCompletedMode || mode;
+      console.log(`[PomodoroApp] Timer completed for mode: ${currentMode}. Playing alerts.`);
 
       if (settings.soundEnabled) playAlarmSound();
       if (settings.vibrationEnabled) triggerVibration();
@@ -72,11 +73,13 @@ export function PomodoroApp() {
         (mode === 'shortBreak' || mode === 'longBreak') &&
         settings.autoStartBreaks
       ) {
+        console.log(`[PomodoroApp] Auto-starting break session`);
         const timeout = setTimeout(() => {
           startTimer();
         }, 1500);
         return () => clearTimeout(timeout);
       } else if (mode === 'work' && settings.autoStartWork) {
+        console.log(`[PomodoroApp] Auto-starting work session`);
         const timeout = setTimeout(() => {
           startTimer();
         }, 1500);
@@ -87,7 +90,10 @@ export function PomodoroApp() {
 
   // Track completed sessions
   useEffect(() => {
-    prevCompletedRef.current = completedWorkSessions;
+    if (prevCompletedRef.current !== completedWorkSessions) {
+      console.log(`[PomodoroApp] Completed work sessions changed: ${prevCompletedRef.current} -> ${completedWorkSessions}`);
+      prevCompletedRef.current = completedWorkSessions;
+    }
   }, [completedWorkSessions]);
 
   // Auto-init FCM once after mount when stored config is available
@@ -126,6 +132,31 @@ export function PomodoroApp() {
     [switchMode]
   );
 
+  const handleSwipe = useCallback(
+    (_event: any, info: any) => {
+      const threshold = 50;
+      const { offset } = info;
+
+      // If vertical movement is greater than horizontal, it's a scroll, not a swipe
+      if (Math.abs(offset.y) > Math.abs(offset.x)) return;
+
+      const currentIndex = MODE_TABS.findIndex((tab) => tab.key === mode);
+
+      if (offset.x < -threshold) {
+        // Swipe Left -> Next Tab
+        const nextIndex = (currentIndex + 1) % MODE_TABS.length;
+        console.log(`[PomodoroApp] Swiped left. Switching to: ${MODE_TABS[nextIndex].key}`);
+        handleModeSwitch(MODE_TABS[nextIndex].key);
+      } else if (offset.x > threshold) {
+        // Swipe Right -> Prev Tab
+        const prevIndex = (currentIndex - 1 + MODE_TABS.length) % MODE_TABS.length;
+        console.log(`[PomodoroApp] Swiped right. Switching to: ${MODE_TABS[prevIndex].key}`);
+        handleModeSwitch(MODE_TABS[prevIndex].key);
+      }
+    },
+    [mode, handleModeSwitch]
+  );
+
   const getAccentBg = (tabKey: string) => {
     switch (tabKey) {
       case 'work': return 'bg-pomodoro-work/10 border-pomodoro-work/20 text-pomodoro-work';
@@ -136,7 +167,7 @@ export function PomodoroApp() {
   };
 
   return (
-    <div className="fixed inset-0 bg-background text-foreground flex flex-col">
+    <div className="fixed inset-0 bg-background text-foreground flex flex-col overflow-hidden">
       {/* Header + Mode Tabs */}
       <div className="flex-shrink-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50 border-b border-border/5">
         <header className="flex items-center justify-between px-6 pt-[calc(env(safe-area-inset-top)+1rem)] pb-3">
@@ -182,20 +213,28 @@ export function PomodoroApp() {
         </div>
       </div>
 
-      {/* Main Content — only timer + controls + tracker, centered */}
-      <main className="flex-1 flex flex-col items-center justify-center px-5 gap-5 min-h-0 overflow-hidden">
-        {/* Circular Timer */}
-        <CircularTimer />
+      {/* Main Content — Scrollable if content exceeds viewport height */}
+      <motion.main
+        className="flex-1 flex flex-col items-center justify-center px-5 py-4 gap-6 min-h-0 overflow-y-auto overflow-x-hidden scrollbar-none touch-pan-y"
+        onPanEnd={handleSwipe}
+      >
+        {/* Container to maintain centering when scrolling is not needed */}
+        <div className="flex flex-col items-center justify-center gap-6 py-4 w-full max-w-md mx-auto pointer-events-none">
+          <div className="pointer-events-auto flex flex-col items-center gap-6 w-full">
+            {/* Circular Timer */}
+            <CircularTimer />
 
-        {/* Controls */}
-        <TimerControls />
+            {/* Controls */}
+            <TimerControls />
 
-        {/* Session Tracker */}
-        <SessionTracker />
-      </main>
+            {/* Session Tracker */}
+            <SessionTracker />
+          </div>
+        </div>
+      </motion.main>
 
       {/* Footer */}
-      <footer className="px-5 pb-[calc(env(safe-area-inset-bottom)+1.25rem)] pt-2 flex-shrink-0">
+      <footer className="px-5 pb-[calc(env(safe-area-inset-bottom)+1.25rem)] pt-2 flex-shrink-0 bg-background/80 backdrop-blur-sm">
         <NotificationBanner />
       </footer>
     </div>

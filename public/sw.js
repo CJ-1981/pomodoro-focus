@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pomodoro-v2';
+const CACHE_NAME = 'pomodoro-v3';
 
 // Use relative paths so this works under any basePath (e.g. /repo-name/)
 // self.location gives us the SW scope automatically
@@ -12,6 +12,7 @@ const ASSETS = [
 
 // Install
 self.addEventListener('install', (event) => {
+  console.log('[SW] Install');
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
@@ -20,6 +21,7 @@ self.addEventListener('install', (event) => {
 
 // Activate
 self.addEventListener('activate', (event) => {
+  console.log('[SW] Activate');
   event.waitUntil(
     caches.keys().then((keys) => 
       Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
@@ -30,11 +32,28 @@ self.addEventListener('activate', (event) => {
 
 // Fetch - network first, fallback to cache
 self.addEventListener('fetch', (event) => {
+  // 1. Only handle GET requests
+  if (event.request.method !== 'GET') return;
+
+  // 2. Only handle http/https requests (ignore chrome-extension, etc)
+  const url = new URL(event.request.url);
+  if (!['http:', 'https:'].includes(url.protocol)) return;
+
   event.respondWith(
     fetch(event.request)
       .then((response) => {
+        // 3. Only cache valid responses
+        if (!response || response.status !== 200 || response.type !== 'basic') {
+          return response;
+        }
+
         const clone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        caches.open(CACHE_NAME).then((cache) => {
+          // Double check the request before putting into cache
+          if (event.request.url.startsWith('http')) {
+            cache.put(event.request, clone);
+          }
+        });
         return response;
       })
       .catch(() => caches.match(event.request))

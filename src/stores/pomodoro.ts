@@ -144,29 +144,57 @@ export const usePomodoroStore = create<PomodoroState>()(
       fcmStatus: 'disconnected' as FcmStatus,
 
       startTimer: () => {
-        const { mode, settings } = get();
+        const { mode, settings, modeStates } = get();
+        console.log(`[Pomodoro] Starting timer for mode: ${mode}`);
         const duration = getDurationForMode(mode, settings);
         const endTime = Date.now() + duration;
-        set({
-          timerState: 'running',
+        const newState = {
+          timerState: 'running' as TimerState,
           endTime,
           totalTime: duration,
           remainingMs: duration,
+        };
+        set({
+          ...newState,
+          modeStates: {
+            ...modeStates,
+            [mode]: newState,
+          },
         });
       },
 
       pauseTimer: () => {
-        set({ timerState: 'paused', endTime: null });
+        const { mode, modeStates, remainingMs } = get();
+        console.log(`[Pomodoro] Pausing timer for mode: ${mode}`);
+        const newState = { timerState: 'paused' as TimerState, endTime: null, remainingMs };
+        set({
+          timerState: 'paused',
+          endTime: null,
+          modeStates: {
+            ...modeStates,
+            [mode]: { ...modeStates[mode], ...newState },
+          },
+        });
       },
 
       resumeTimer: () => {
-        const { remainingMs } = get();
+        const { mode, modeStates, remainingMs } = get();
+        console.log(`[Pomodoro] Resuming timer for mode: ${mode}`);
         const endTime = Date.now() + remainingMs;
-        set({ timerState: 'running', endTime });
+        const newState = { timerState: 'running' as TimerState, endTime };
+        set({
+          timerState: 'running',
+          endTime,
+          modeStates: {
+            ...modeStates,
+            [mode]: { ...modeStates[mode], ...newState },
+          },
+        });
       },
 
       resetTimer: () => {
         const { mode, settings, modeStates } = get();
+        console.log(`[Pomodoro] Resetting timer for mode: ${mode}`);
         const duration = getDurationForMode(mode, settings);
         const newState = {
           timerState: 'idle' as TimerState,
@@ -189,6 +217,8 @@ export const usePomodoroStore = create<PomodoroState>()(
         // If switching to the same mode, do nothing (prevents reset)
         if (newMode === mode) return;
 
+        console.log(`[Pomodoro] Switching mode from ${mode} to ${newMode}`);
+
         // Save current state
         const updatedModeStates = {
           ...modeStates,
@@ -210,6 +240,7 @@ export const usePomodoroStore = create<PomodoroState>()(
 
       timerComplete: () => {
         const { mode, completedWorkSessions, settings, modeStates } = get();
+        console.log(`[Pomodoro] Timer complete for mode: ${mode}`);
         let nextMode: TimerMode = mode;
         let newCompletedWorkSessions = completedWorkSessions;
         let newTotalCompletedToday = get().totalCompletedToday;
@@ -221,6 +252,8 @@ export const usePomodoroStore = create<PomodoroState>()(
         } else {
           nextMode = 'work';
         }
+
+        console.log(`[Pomodoro] Next mode will be: ${nextMode}`);
 
         // Reset the mode that just completed to idle/default
         const completedModeDuration = getDurationForMode(mode, settings);
@@ -241,6 +274,9 @@ export const usePomodoroStore = create<PomodoroState>()(
           [mode]: resetCompletedMode,
         };
 
+        const finalNextRemaining = nextState.timerState === 'idle' ? nextModeDuration : nextState.remainingMs;
+        const finalNextTotal = nextState.timerState === 'idle' ? nextModeDuration : nextState.totalTime;
+
         set({
           timerState: 'completed',
           completedWorkSessions: newCompletedWorkSessions,
@@ -248,22 +284,66 @@ export const usePomodoroStore = create<PomodoroState>()(
           mode: nextMode,
           lastCompletedMode: mode,
           endTime: null,
-          remainingMs: nextState.timerState === 'idle' ? nextModeDuration : nextState.remainingMs,
-          totalTime: nextState.timerState === 'idle' ? nextModeDuration : nextState.totalTime,
+          remainingMs: finalNextRemaining,
+          totalTime: finalNextTotal,
           modeStates: updatedModeStates,
         });
       },
 
       updateRemaining: () => {
-        const { endTime, timerState } = get();
-        if (timerState !== 'running' || !endTime) return;
+        const { mode, modeStates, timerState, endTime } = get();
+        const now = Date.now();
+        let stateChanged = false;
+        const newModeStates = { ...modeStates };
 
-        const remaining = endTime - Date.now();
-        if (remaining <= 0) {
-          set({ remainingMs: 0 });
-          get().timerComplete();
-        } else {
-          set({ remainingMs: remaining });
+        // 1. Update all running timers in modeStates
+        (Object.keys(newModeStates) as TimerMode[]).forEach((m) => {
+          const ms = newModeStates[m];
+          if (ms.timerState === 'running' && ms.endTime) {
+            const remaining = ms.endTime - now;
+            if (remaining <= 0) {
+              // This timer finished!
+              console.log(`[Pomodoro] Background timer finished for mode: ${m}`);
+              const duration = getDurationForMode(m, get().settings);
+              newModeStates[m] = {
+                timerState: 'completed',
+                endTime: null,
+                remainingMs: 0,
+                totalTime: duration,
+              };
+              
+              // If this was the active mode, we'll trigger timerComplete later
+              if (m === mode) {
+                stateChanged = true;
+              } else {
+                // If it was NOT the active mode, we still need to handle completion (e.g. notifications)
+                // However, timerComplete() currently assumes it's the active mode.
+                // For simplicity, we just mark it completed in modeStates.
+                // The user will see it's complete when they switch back.
+              }
+            } else {
+              newModeStates[m] = {
+                ...ms,
+                remainingMs: remaining,
+              };
+              if (m === mode) stateChanged = true;
+            }
+          }
+        });
+
+        // 2. Sync active mode state to top-level if needed
+        if (stateChanged || (timerState === 'running' && endTime)) {
+          const currentModeState = newModeStates[mode];
+          
+          if (currentModeState.timerState === 'completed' && currentModeState.remainingMs === 0) {
+             set({ modeStates: newModeStates });
+             get().timerComplete();
+          } else {
+            set({
+              remainingMs: currentModeState.remainingMs,
+              modeStates: newModeStates,
+            });
+          }
         }
       },
 

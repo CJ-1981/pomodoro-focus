@@ -85,6 +85,7 @@ export function CircularTimer() {
           strokeWidth={strokeWidth}
           strokeLinecap="round"
           strokeDasharray={circumference}
+          initial={{ strokeDashoffset: circumference }}
           animate={{ strokeDashoffset }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
         />
