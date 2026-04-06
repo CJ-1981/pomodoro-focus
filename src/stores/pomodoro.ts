@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { logger } from '@/lib/logger';
 
 type TimerMode = 'work' | 'shortBreak' | 'longBreak';
 type TimerState = 'idle' | 'running' | 'paused' | 'completed';
@@ -145,7 +146,7 @@ export const usePomodoroStore = create<PomodoroState>()(
 
       startTimer: () => {
         const { mode, settings, modeStates } = get();
-        console.log(`[Pomodoro] Starting timer for mode: ${mode}`);
+        logger.log(`[Pomodoro] Starting timer for mode: ${mode}`);
         const duration = getDurationForMode(mode, settings);
         const endTime = Date.now() + duration;
         const newState = {
@@ -165,7 +166,7 @@ export const usePomodoroStore = create<PomodoroState>()(
 
       pauseTimer: () => {
         const { mode, modeStates, remainingMs } = get();
-        console.log(`[Pomodoro] Pausing timer for mode: ${mode}`);
+        logger.log(`[Pomodoro] Pausing timer for mode: ${mode}`);
         const newState = { timerState: 'paused' as TimerState, endTime: null, remainingMs };
         set({
           timerState: 'paused',
@@ -179,7 +180,7 @@ export const usePomodoroStore = create<PomodoroState>()(
 
       resumeTimer: () => {
         const { mode, modeStates, remainingMs } = get();
-        console.log(`[Pomodoro] Resuming timer for mode: ${mode}`);
+        logger.log(`[Pomodoro] Resuming timer for mode: ${mode}`);
         const endTime = Date.now() + remainingMs;
         const newState = { timerState: 'running' as TimerState, endTime };
         set({
@@ -194,7 +195,7 @@ export const usePomodoroStore = create<PomodoroState>()(
 
       resetTimer: () => {
         const { mode, settings, modeStates } = get();
-        console.log(`[Pomodoro] Resetting timer for mode: ${mode}`);
+        logger.log(`[Pomodoro] Resetting timer for mode: ${mode}`);
         const duration = getDurationForMode(mode, settings);
         const newState = {
           timerState: 'idle' as TimerState,
@@ -217,7 +218,7 @@ export const usePomodoroStore = create<PomodoroState>()(
         // If switching to the same mode, do nothing (prevents reset)
         if (newMode === mode) return;
 
-        console.log(`[Pomodoro] Switching mode from ${mode} to ${newMode}`);
+        logger.log(`[Pomodoro] Switching mode from ${mode} to ${newMode}`);
 
         // Save current state
         const updatedModeStates = {
@@ -240,7 +241,7 @@ export const usePomodoroStore = create<PomodoroState>()(
 
       timerComplete: () => {
         const { mode, completedWorkSessions, settings, modeStates } = get();
-        console.log(`[Pomodoro] Timer complete for mode: ${mode}`);
+        logger.log(`[Pomodoro] Timer complete for mode: ${mode}`);
         let nextMode: TimerMode = mode;
         let newCompletedWorkSessions = completedWorkSessions;
         let newTotalCompletedToday = get().totalCompletedToday;
@@ -253,7 +254,7 @@ export const usePomodoroStore = create<PomodoroState>()(
           nextMode = 'work';
         }
 
-        console.log(`[Pomodoro] Next mode will be: ${nextMode}`);
+        logger.log(`[Pomodoro] Next mode will be: ${nextMode}`);
 
         // Reset the mode that just completed to idle/default
         const completedModeDuration = getDurationForMode(mode, settings);
@@ -303,7 +304,7 @@ export const usePomodoroStore = create<PomodoroState>()(
             const remaining = ms.endTime - now;
             if (remaining <= 0) {
               // This timer finished!
-              console.log(`[Pomodoro] Background timer finished for mode: ${m}`);
+              logger.log(`[Pomodoro] Background timer finished for mode: ${m}`);
               const duration = getDurationForMode(m, get().settings);
               newModeStates[m] = {
                 timerState: 'completed',

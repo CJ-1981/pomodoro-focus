@@ -12,7 +12,6 @@ const ASSETS = [
 
 // Install
 self.addEventListener('install', (event) => {
-  console.log('[SW] Install');
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
@@ -21,7 +20,6 @@ self.addEventListener('install', (event) => {
 
 // Activate
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activate');
   event.waitUntil(
     caches.keys().then((keys) => 
       Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))

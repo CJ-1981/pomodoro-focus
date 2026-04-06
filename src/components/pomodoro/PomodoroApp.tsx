@@ -4,6 +4,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Github } from 'lucide-react';
 import { usePomodoroStore } from '@/stores/pomodoro';
+import { logger } from '@/lib/logger';
 import { notifyTimerComplete, playAlarmSound, triggerVibration, initFCM } from '@/lib/fcm';
 import { CircularTimer } from './CircularTimer';
 import { TimerControls } from './TimerControls';
@@ -61,7 +62,7 @@ export function PomodoroApp() {
   useEffect(() => {
     if (timerState === 'completed') {
       const currentMode = lastCompletedMode || mode;
-      console.log(`[PomodoroApp] Timer completed for mode: ${currentMode}. Playing alerts.`);
+      logger.log(`[PomodoroApp] Timer completed for mode: ${currentMode}. Playing alerts.`);
 
       if (settings.soundEnabled) playAlarmSound();
       if (settings.vibrationEnabled) triggerVibration();
@@ -74,13 +75,13 @@ export function PomodoroApp() {
         (mode === 'shortBreak' || mode === 'longBreak') &&
         settings.autoStartBreaks
       ) {
-        console.log(`[PomodoroApp] Auto-starting break session`);
+        logger.log(`[PomodoroApp] Auto-starting break session`);
         const timeout = setTimeout(() => {
           startTimer();
         }, 1500);
         return () => clearTimeout(timeout);
       } else if (mode === 'work' && settings.autoStartWork) {
-        console.log(`[PomodoroApp] Auto-starting work session`);
+        logger.log(`[PomodoroApp] Auto-starting work session`);
         const timeout = setTimeout(() => {
           startTimer();
         }, 1500);
@@ -92,7 +93,7 @@ export function PomodoroApp() {
   // Track completed sessions
   useEffect(() => {
     if (prevCompletedRef.current !== completedWorkSessions) {
-      console.log(`[PomodoroApp] Completed work sessions changed: ${prevCompletedRef.current} -> ${completedWorkSessions}`);
+      logger.log(`[PomodoroApp] Completed work sessions changed: ${prevCompletedRef.current} -> ${completedWorkSessions}`);
       prevCompletedRef.current = completedWorkSessions;
     }
   }, [completedWorkSessions]);
@@ -118,10 +119,10 @@ export function PomodoroApp() {
       navigator.serviceWorker
         .register('./sw.js')
         .then((registration) => {
-          console.log('Service Worker registered:', registration.scope);
+          logger.log('Service Worker registered:', registration.scope);
         })
         .catch((error) => {
-          console.log('Service Worker registration failed:', error);
+          logger.log('Service Worker registration failed:', error);
         });
     }
   }, []);
@@ -146,12 +147,12 @@ export function PomodoroApp() {
       if (offset.x < -threshold) {
         // Swipe Left -> Next Tab
         const nextIndex = (currentIndex + 1) % MODE_TABS.length;
-        console.log(`[PomodoroApp] Swiped left. Switching to: ${MODE_TABS[nextIndex].key}`);
+        logger.log(`[PomodoroApp] Swiped left. Switching to: ${MODE_TABS[nextIndex].key}`);
         handleModeSwitch(MODE_TABS[nextIndex].key);
       } else if (offset.x > threshold) {
         // Swipe Right -> Prev Tab
         const prevIndex = (currentIndex - 1 + MODE_TABS.length) % MODE_TABS.length;
-        console.log(`[PomodoroApp] Swiped right. Switching to: ${MODE_TABS[prevIndex].key}`);
+        logger.log(`[PomodoroApp] Swiped right. Switching to: ${MODE_TABS[prevIndex].key}`);
         handleModeSwitch(MODE_TABS[prevIndex].key);
       }
     },

@@ -25,8 +25,6 @@ async function initFirebase(config) {
         data: payload.data,
       });
     });
-
-    console.log('Firebase Messaging SW initialized');
   } catch (e) {
     console.error('Firebase SW init failed:', e);
   }
@@ -40,7 +38,7 @@ async function loadConfigFromCache() {
       return await response.json();
     }
   } catch (e) {
-    console.log('No cached Firebase config');
+    // No cached Firebase config
   }
   return null;
 }
