@@ -11,6 +11,7 @@ import {
   ChevronDown,
   ChevronRight,
   Trash2,
+  RotateCcw,
   Loader2,
   CheckCircle2,
   XCircle,
@@ -80,7 +81,7 @@ function FcmStatusBadge({ status }: { status: string }) {
 }
 
 export function SettingsSheet() {
-  const { settings, updateSettings, firebaseConfig, updateFirebaseConfig, fcmStatus, setFcmStatus } =
+  const { settings, updateSettings, resetSettings, firebaseConfig, updateFirebaseConfig, fcmStatus, setFcmStatus } =
     usePomodoroStore();
   const [fcmOpen, setFcmOpen] = useState(false);
 
@@ -122,11 +123,22 @@ export function SettingsSheet() {
         side="bottom"
         className="bg-card border-t border-border text-card-foreground rounded-t-2xl max-h-[85vh] overflow-y-auto scrollbar-none max-w-lg mx-auto left-0 right-0 px-6 pt-4 pb-32"
       >
-        <SheetHeader className="text-left pb-0 px-0">
-          <SheetTitle className="text-card-foreground text-base">Timer Settings</SheetTitle>
-          <SheetDescription className="text-muted-foreground text-xs">
-            Customize your Pomodoro experience
-          </SheetDescription>
+        <SheetHeader className="text-left pb-0 px-0 flex-row items-center justify-between space-y-0">
+          <div className="space-y-1">
+            <SheetTitle className="text-card-foreground text-base">Timer Settings</SheetTitle>
+            <SheetDescription className="text-muted-foreground text-xs">
+              Customize your Pomodoro experience
+            </SheetDescription>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={resetSettings}
+            className="h-8 px-2 text-[11px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted"
+          >
+            <RotateCcw className="h-3 w-3 mr-1.5" />
+            Reset to Defaults
+          </Button>
         </SheetHeader>
 
         <div className="space-y-5 mt-4">

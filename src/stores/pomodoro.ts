@@ -79,6 +79,7 @@ interface PomodoroState {
   timerComplete: () => void;
   updateRemaining: () => void;
   updateSettings: (settings: Partial<PomodoroSettings>) => void;
+  resetSettings: () => void;
   updateFirebaseConfig: (config: Partial<FirebaseConfig>) => void;
   setFcmStatus: (status: FcmStatus) => void;
   tick: () => void; // Called every second
@@ -380,6 +381,28 @@ export const usePomodoroStore = create<PomodoroState>()(
           });
         } else {
           set({ settings: merged, modeStates: updatedModeStates });
+        }
+      },
+
+      resetSettings: () => {
+        const { mode, timerState } = get();
+        const newModeStates = createInitialModeStates(DEFAULT_SETTINGS);
+        
+        if (timerState === 'idle' || timerState === 'completed') {
+          const duration = getDurationForMode(mode, DEFAULT_SETTINGS);
+          set({
+            settings: DEFAULT_SETTINGS,
+            modeStates: newModeStates,
+            timerState: 'idle',
+            remainingMs: duration,
+            totalTime: duration,
+            endTime: null,
+          });
+        } else {
+          set({
+            settings: DEFAULT_SETTINGS,
+            modeStates: newModeStates,
+          });
         }
       },
 
