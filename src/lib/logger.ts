@@ -8,9 +8,8 @@ export const logger = {
     }
   },
   warn: (...args: any[]) => {
-    if (process.env.NODE_ENV !== 'production') {
-      console.warn(...args);
-    }
+    // Keep warnings in production to help with debugging
+    console.warn(...args);
   },
   error: (...args: any[]) => {
     // We usually keep errors even in production

@@ -21,17 +21,8 @@ export function hasNotificationPermission(): boolean {
 /**
  * Initialize FCM using config from the store (localStorage).
  * Returns the FCM token on success, null otherwise.
- *
- * NOTE: This is a static export — there is no backend to store the FCM token or
- * send push notifications. For full push notification support, you would need a
- * serverless function, Cloud Function, or external service to:
- *   1. Store the FCM token
- *   2. Send push messages via the Firebase Cloud Messaging HTTP API
- *
- * The token is logged to the console so you can manually use it for testing.
- * Local notifications (Notification API) still work without any server.
  */
-export async function initFCM(config: FirebaseConfig): Promise<string | null> {
+export async function initFCM(config: FirebaseConfig, retryCount = 3): Promise<string | null> {
   if (typeof window === 'undefined') return null;
 
   if (!isFirebaseConfigured(config)) {
@@ -39,44 +30,71 @@ export async function initFCM(config: FirebaseConfig): Promise<string | null> {
     return null;
   }
 
-  try {
-    const { initializeApp, getApps, getApp } = await import('firebase/app');
-    const { getMessaging, getToken } = await import('firebase/messaging');
+  let attempt = 0;
+  while (attempt < retryCount) {
+    try {
+      // 1. Check permission first
+      if (typeof Notification !== 'undefined' && Notification.permission !== 'granted') {
+        console.warn(`[Pomodoro] FCM initialization attempt ${attempt + 1}: Notification permission is ${Notification.permission}. Token retrieval may fail.`);
+      }
 
-    const clientConfig = getFirebaseClientConfig(config);
-    const appName = 'pomodoro-fcm';
-    const app = getApps().find((a) => a.name === appName) 
-      ? getApp(appName) 
-      : initializeApp(clientConfig, appName);
-    const messaging = getMessaging(app);
+      const { initializeApp, getApps, getApp } = await import('firebase/app');
+      const { getMessaging, getToken } = await import('firebase/messaging');
 
-    const token = await getToken(messaging, {
-      vapidKey: config.vapidKey,
-      serviceWorkerRegistration: await navigator.serviceWorker.ready,
-    });
+      const clientConfig = getFirebaseClientConfig(config);
+      const appName = 'pomodoro-fcm';
+      const app = getApps().find((a) => a.name === appName) 
+        ? getApp(appName) 
+        : initializeApp(clientConfig, appName);
+      const messaging = getMessaging(app);
 
-    // Cache config for service worker background messaging
-    await cacheFirebaseConfigForSW(config);
+      // 2. Ensure service worker is ready with timeout
+      const swReadyPromise = navigator.serviceWorker.ready;
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Service worker ready timeout (10s)')), 10000)
+      );
+      
+      const registration = await Promise.race([swReadyPromise, timeoutPromise]) as ServiceWorkerRegistration;
+      if (!registration) {
+        throw new Error('Service worker registration not found');
+      }
 
-    // Notify service worker about the new config
-    if (navigator.serviceWorker.controller) {
-      navigator.serviceWorker.controller.postMessage({
-        type: 'FIREBASE_CONFIG',
-        config: clientConfig,
+      const token = await getToken(messaging, {
+        vapidKey: config.vapidKey,
+        serviceWorkerRegistration: registration,
       });
+
+      // 3. Cache config for service worker background messaging
+      await cacheFirebaseConfigForSW(config);
+
+      // 4. Notify service worker about the new config
+      if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+          type: 'FIREBASE_CONFIG',
+          config: clientConfig,
+        });
+      }
+
+      // Log success
+      console.log(
+        `[Pomodoro] FCM initialized successfully on attempt ${attempt + 1}.`,
+        'Token:', token
+      );
+
+      return token;
+    } catch (error) {
+      attempt++;
+      console.warn(`[Pomodoro] FCM initialization attempt ${attempt} failed:`, error);
+      if (attempt >= retryCount) {
+        console.error('[Pomodoro] FCM initialization failed after max retries.');
+        throw error;
+      }
+      // Wait before next attempt (backoff: 1s, 2s)
+      await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
     }
-
-    // Log token for manual use — in a static export there is no server endpoint
-    console.log(
-      '[Pomodoro] FCM initialized successfully. Token (save this for testing):',
-      token
-    );
-
-    return token;
-  } catch (error) {
-    console.error('FCM initialization failed:', error);
-    throw error;
   }
+
+  return null;
 }
 
 // Local notification fallback

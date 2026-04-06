@@ -117,44 +117,45 @@ export function PomodoroApp() {
     }
   }, [completedWorkSessions]);
 
-  // Auto-init FCM once after mount when stored config is available
+  // Combined Service Worker & FCM initialization
   useEffect(() => {
     if (!_hasHydrated || fcmInitRef.current) return;
-    
-    // Once hydrated, we take our one shot at auto-reconnect
     fcmInitRef.current = true;
 
-    const isConfigured =
-      !!firebaseConfig.apiKey && !!firebaseConfig.projectId && !!firebaseConfig.vapidKey;
-    
-    if (isConfigured && fcmStatus === 'disconnected') {
-      logger.log('[PomodoroApp] Auto-reconnecting FCM...');
-      setFcmStatus('connecting');
-      initFCM(firebaseConfig)
-        .then(() => {
-          logger.log('[PomodoroApp] FCM reconnected successfully.');
-          setFcmStatus('connected');
-        })
-        .catch((error) => {
-          logger.warn('[PomodoroApp] FCM reconnection failed:', error);
-          setFcmStatus('error');
-        });
-    }
-  }, [_hasHydrated, firebaseConfig, fcmStatus, setFcmStatus]);
+    async function setupServiceWorker() {
+      if (!('serviceWorker' in navigator)) return;
 
-  // Register service worker
-  useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker
-        .register('./sw.js')
-        .then((registration) => {
-          logger.log('Service Worker registered:', registration.scope);
-        })
-        .catch((error) => {
-          logger.log('Service Worker registration failed:', error);
-        });
+      try {
+        const registration = await navigator.serviceWorker.register('./sw.js');
+        logger.log('Service Worker registered:', registration.scope);
+
+        // Auto-reconnect FCM if configured
+        const isConfigured =
+          !!firebaseConfig.apiKey && !!firebaseConfig.projectId && !!firebaseConfig.vapidKey;
+        
+        if (isConfigured && fcmStatus === 'disconnected') {
+          // Small delay to let SW settle
+          await new Promise(r => setTimeout(r, 1000));
+          
+          logger.log('[PomodoroApp] Auto-reconnecting FCM...');
+          setFcmStatus('connecting');
+          
+          try {
+            await initFCM(firebaseConfig);
+            logger.log('[PomodoroApp] FCM reconnected successfully.');
+            setFcmStatus('connected');
+          } catch (error) {
+            logger.warn('[PomodoroApp] FCM reconnection failed after retries:', error);
+            setFcmStatus('error');
+          }
+        }
+      } catch (error) {
+        logger.log('Service Worker registration failed:', error);
+      }
     }
-  }, []);
+
+    setupServiceWorker();
+  }, [_hasHydrated, firebaseConfig, fcmStatus, setFcmStatus]);
 
   const handleModeSwitch = useCallback(
     (newMode: typeof MODE_TABS[number]['key']) => {
