@@ -249,21 +249,16 @@ export const usePomodoroStore = create<PomodoroState>()(
       timerComplete: () => {
         const { mode, completedWorkSessions, settings, modeStates } = get();
         logger.log(`[Pomodoro] Timer complete for mode: ${mode}`);
-        let nextMode: TimerMode = mode;
+        
         let newCompletedWorkSessions = completedWorkSessions;
         let newTotalCompletedToday = get().totalCompletedToday;
 
         if (mode === 'work') {
           newCompletedWorkSessions = completedWorkSessions + 1;
           newTotalCompletedToday += 1;
-          nextMode = newCompletedWorkSessions % settings.longBreakInterval === 0 ? 'longBreak' : 'shortBreak';
-        } else {
-          nextMode = 'work';
         }
 
-        logger.log(`[Pomodoro] Next mode will be: ${nextMode}`);
-
-        // Reset the mode that just completed to idle/default
+        // Reset the mode that just completed
         const completedModeDuration = getDurationForMode(mode, settings);
         const resetCompletedMode: ModeState = {
           timerState: 'completed',
@@ -273,28 +268,18 @@ export const usePomodoroStore = create<PomodoroState>()(
           completedAt: Date.now(),
         };
 
-        // Also prepare the next mode if it was idle
-        const nextModeDuration = getDurationForMode(nextMode, settings);
-        const nextState = modeStates[nextMode];
-        
-        // Save states
         const updatedModeStates = {
           ...modeStates,
           [mode]: resetCompletedMode,
         };
 
-        const finalNextRemaining = nextState.timerState === 'idle' ? nextModeDuration : nextState.remainingMs;
-        const finalNextTotal = nextState.timerState === 'idle' ? nextModeDuration : nextState.totalTime;
-
         set({
           timerState: 'completed',
           completedWorkSessions: newCompletedWorkSessions,
           totalCompletedToday: newTotalCompletedToday,
-          mode: nextMode,
           lastCompletedMode: mode,
           endTime: null,
-          remainingMs: finalNextRemaining,
-          totalTime: finalNextTotal,
+          remainingMs: 0,
           modeStates: updatedModeStates,
         });
       },

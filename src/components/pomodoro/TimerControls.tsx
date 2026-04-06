@@ -34,6 +34,7 @@ export function TimerControls() {
     resumeTimer,
     resetTimer,
     timerComplete,
+    switchMode,
     completedWorkSessions,
   } = usePomodoroStore();
 
@@ -42,7 +43,15 @@ export function TimerControls() {
   const isIdle = timerState === 'idle' || timerState === 'completed';
 
   const handleMainAction = () => {
-    if (isIdle || timerState === 'completed') {
+    if (timerState === 'completed') {
+      // Switch to next mode before starting
+      let nextMode: 'work' | 'shortBreak' | 'longBreak' = 'work';
+      if (mode === 'work') {
+        nextMode = (completedWorkSessions) % settings.longBreakInterval === 0 ? 'longBreak' : 'shortBreak';
+      }
+      switchMode(nextMode);
+      startTimer();
+    } else if (isIdle) {
       startTimer();
     } else if (isRunning) {
       pauseTimer();

@@ -87,21 +87,22 @@ export function PomodoroApp() {
         }
 
         // Auto-start next session if this is the active mode
-        if (modeKey === lastCompletedMode || modeKey === mode) {
+        if (modeKey === mode) {
+          let nextMode: 'work' | 'shortBreak' | 'longBreak' = 'work';
+          if (modeKey === 'work') {
+            const sessions = usePomodoroStore.getState().completedWorkSessions;
+            nextMode = sessions % settings.longBreakInterval === 0 ? 'longBreak' : 'shortBreak';
+          }
+
           if (
-            (mode === 'shortBreak' || mode === 'longBreak') &&
-            settings.autoStartBreaks
+            ((modeKey === 'work') && settings.autoStartBreaks) ||
+            ((modeKey === 'shortBreak' || modeKey === 'longBreak') && settings.autoStartWork)
           ) {
-            logger.log(`[PomodoroApp] Auto-starting break session`);
+            logger.log(`[PomodoroApp] Auto-starting next session: ${nextMode}`);
             const timeout = setTimeout(() => {
+              switchMode(nextMode);
               startTimer();
-            }, 1500);
-            return () => clearTimeout(timeout);
-          } else if (mode === 'work' && settings.autoStartWork) {
-            logger.log(`[PomodoroApp] Auto-starting work session`);
-            const timeout = setTimeout(() => {
-              startTimer();
-            }, 1500);
+            }, 2000); // 2s delay to show 'COMPLETE' state
             return () => clearTimeout(timeout);
           }
         }
