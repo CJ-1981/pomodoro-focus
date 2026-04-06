@@ -6,13 +6,14 @@ A clean, modern, and highly functional Pomodoro timer designed to help you stay 
 
 ## ✨ Features
 
-- **🎯 Smart Timer:** Seamlessly switch between Focus, Short Break, and Long Break sessions without losing your timer progress in each mode.
-- **🔄 Session Tracking:** Visual indicators to track your progress towards a long break.
-- **🔔 Real-time Notifications:** Desktop and browser notifications to alert you when a session ends.
-- **🌓 Dark Mode:** Responsive theme toggle for comfortable use day or night.
-- **⚙️ Customization:** Adjust timer durations and session counts to fit your workflow.
-- **📱 PWA Ready:** Installable as a progressive web app for a native experience.
-- **☁️ Syncing:** Powered by Firebase/FCM for push notifications.
+- **🎯 Smart Timer:** Seamlessly switch between Focus, Short Break, and Long Break sessions with per-mode progress preservation and background ticking.
+- **🖐️ Gesture Navigation:** Intuitive swipe left/right gestures to switch between timer modes.
+- **📊 Session Statistics:** Detailed daily summary with a convenient "Copy to Markdown" feature for productivity logging.
+- **🎵 Mode-Specific Audio:** Distinct, pleasant audio patterns for each session type.
+- **🔄 Session Tracking:** Visual indicators on tabs and a cycle tracker to monitor your progress.
+- **🌗 Dark Mode:** Responsive theme toggle for comfortable use day or night.
+- **📱 PWA Ready:** High-quality SVG icons and installable as a progressive web app for a native experience.
+- **⚙️ Customization:** Adjust timer durations and automation settings with a quick "Reset to Defaults" option.
 
 ## 🛠️ Tech Stack
 

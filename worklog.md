@@ -140,25 +140,39 @@ Stage Summary:
 - Safe area insets handled with viewport-fit:cover + max() padding utility classes
 
 ---
-Task ID: 5
+Task ID: 6
 Agent: Main Agent
-Task: Implement per-mode timer state preservation
+Task: Multi-mode Robustness, Gesture Navigation, and UX Polish
 
 Work Log:
-- Modified src/stores/pomodoro.ts:
-    - Added ModeState interface to track timerState, endTime, remainingMs, and totalTime for each mode.
-    - Updated PomodoroState to include modeStates (Record<TimerMode, ModeState>) and lastCompletedMode.
-    - Rewrote switchMode to save the current mode's state before loading the next mode's state, preventing resets when switching tabs.
-    - Updated resetTimer, timerComplete, and updateSettings to correctly handle per-mode states.
-    - Ensured timerComplete sets lastCompletedMode to facilitate accurate notifications.
-- Modified src/components/pomodoro/PomodoroApp.tsx:
-    - Updated the timer completion effect to use lastCompletedMode for notifications, ensuring the correct session type is reported even if the user has switched tabs.
-    - Fixed auto-start logic to use the correct mode reference after session completion.
-- Verified that switching between Focus, Short Break, and Long Break tabs maintains the timer progress for each independently.
-- Verified that clicking the already active tab does not reset the timer.
+- **Multi-mode Enhancements:**
+    - Re-implemented `updateRemaining` in `pomodoro.ts` to support background ticking for all modes simultaneously.
+    - Added `completedAt` timestamp to `ModeState` to track precise completion events.
+    - Implemented `lastNotifiedAtRef` in `PomodoroApp.tsx` to ensure each mode's completion alerts (audio/vibration) trigger exactly once, even when switching tabs after a background completion.
+- **Navigation & Gestures:**
+    - Added horizontal swipe left/right gestures to switch between Focus, Short, and Long Break modes using Framer Motion's `onPanEnd`.
+    - Added subtle horizontal progress bars under each tab label to provide a visual status of background timers.
+- **Audio & Media:**
+    - Created mode-specific audio patterns (Energetic for Focus, Gentle for Short Break, Celebratory for Long Break).
+    - Fixed browser `AudioContext` autoplay restrictions by implementing a singleton context that resumes on the first user interaction (`onClick` on root container).
+- **UI & Layout Optimizations:**
+    - Removed fixed footer to maximize vertical space; moved GitHub link and notifications into the scrollable main area.
+    - Scaled the main view down by 5% (`scale-95`) and refined gaps to ensure a zero-scroll experience on small devices like iPhone SE (667px height).
+    - Hidden scrollbars on mobile via global CSS utility for a cleaner, native-app feel.
+    - Created high-quality SVG app icons and favicon using the tomato emoji for better cross-platform visual consistency.
+- **New Features:**
+    - **Session Stats:** Created `SessionStatsDialog` with a detailed daily summary and a "Copy to Markdown" feature for easy productivity logging.
+    - **Settings:** Added a "Reset to Defaults" button to quickly restore all timer and automation settings.
+- **Stability & Bug Fixes:**
+    - Fixed `ReferenceError: modeStates is not defined` in `PomodoroApp.tsx`.
+    - Fixed `strokeDashoffset` animation warning in `CircularTimer.tsx` by providing initial values.
+    - Upgraded Service Worker to **Cache v3** and implemented strict fetch filtering to prevent `chrome-extension:` scheme errors.
+    - Optimized `updateSettings` to reflect duration changes immediately in the UI when the timer is idle.
 
 Stage Summary:
-- 2 files modified: src/stores/pomodoro.ts, src/components/pomodoro/PomodoroApp.tsx
-- Persistent timer state across all three modes (Focus, Short Break, Long Break)
-- Accurate notifications regardless of active tab
-- Auto-start functionality preserved and fixed for the new multi-state architecture
+- 10+ files modified/created total.
+- Robust, multi-mode timer architecture with background accuracy.
+- Native-like UX with swipe gestures and hidden scrollbars.
+- Comprehensive session statistics and sharing.
+- Fixed critical audio and layout bugs for mobile browsers.
+- Production-ready PWA assets and logging.
