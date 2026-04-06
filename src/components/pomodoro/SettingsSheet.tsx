@@ -120,7 +120,7 @@ export function SettingsSheet() {
 
       <SheetContent
         side="bottom"
-        className="bg-card border-t border-border text-card-foreground rounded-t-2xl max-h-[85vh] overflow-y-auto max-w-lg mx-auto left-0 right-0 px-6 pt-4 pb-32"
+        className="bg-card border-t border-border text-card-foreground rounded-t-2xl max-h-[85vh] overflow-y-auto scrollbar-none max-w-lg mx-auto left-0 right-0 px-6 pt-4 pb-32"
       >
         <SheetHeader className="text-left pb-0 px-0">
           <SheetTitle className="text-card-foreground text-base">Timer Settings</SheetTitle>
