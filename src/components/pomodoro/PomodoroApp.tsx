@@ -219,66 +219,68 @@ export function PomodoroApp() {
     >
       {/* Header + Mode Tabs */}
       <div className="flex-shrink-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50 border-b border-border/5">
-        <header className="flex items-center justify-between px-6 pt-[calc(env(safe-area-inset-top)+1rem)] pb-3">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-pomodoro-work flex items-center justify-center shadow-sm">
-              <span className="text-base">🍅</span>
+        <div className="max-w-screen-md mx-auto">
+          <header className="flex items-center justify-between px-6 pt-[calc(env(safe-area-inset-top)+1rem)] pb-3">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-pomodoro-work flex items-center justify-center shadow-sm">
+                <span className="text-base">🍅</span>
+              </div>
+              <h1 className="text-xl font-bold tracking-tight">Pomodoro</h1>
             </div>
-            <h1 className="text-xl font-bold tracking-tight">Pomodoro</h1>
-          </div>
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <SettingsSheet />
-          </div>
-        </header>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <SettingsSheet />
+            </div>
+          </header>
 
-        {/* Mode Tabs — pinned below header, never overlaps */}
-        <div className="flex justify-center px-5 pt-1 pb-2">
-          <motion.div
-            className="flex items-center gap-1 bg-muted/60 rounded-xl p-1 border border-border/50"
-            layout
-          >
-            {MODE_TABS.map((tab) => {
-              const ms = modeStates[tab.key];
-              const progress = ms.totalTime > 0 ? (ms.remainingMs / ms.totalTime) * 100 : 0;
-              const isRunning = ms.timerState === 'running';
+          {/* Mode Tabs — pinned below header, never overlaps */}
+          <div className="flex justify-center px-5 pt-1 pb-2">
+            <motion.div
+              className="flex items-center gap-1 bg-muted/60 rounded-xl p-1 border border-border/50"
+              layout
+            >
+              {MODE_TABS.map((tab) => {
+                const ms = modeStates[tab.key];
+                const progress = ms.totalTime > 0 ? (ms.remainingMs / ms.totalTime) * 100 : 0;
+                const isRunning = ms.timerState === 'running';
 
-              return (
-                <button
-                  key={tab.key}
-                  onClick={() => handleModeSwitch(tab.key)}
-                  className={`relative px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 min-h-[44px] flex flex-col items-center justify-center gap-0.5 ${
-                    mode === tab.key
-                      ? 'text-foreground'
-                      : 'text-muted-foreground hover:text-foreground/70'
-                  }`}
-                >
-                  {mode === tab.key && (
-                    <motion.div
-                      layoutId="activeTab"
-                      className={`absolute inset-0 rounded-lg border ${getAccentBg(tab.key)}`}
-                      transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
-                    />
-                  )}
-                  <span className="relative z-10">{tab.label}</span>
-                  
-                  {/* Progress Indicator Bar */}
-                  <div className="relative z-10 w-8 h-0.5 mt-0.5 rounded-full bg-muted overflow-hidden">
-                    <motion.div 
-                      className={`h-full ${
-                        tab.key === 'work' ? 'bg-pomodoro-work' : 
-                        tab.key === 'shortBreak' ? 'bg-pomodoro-short' : 
-                        'bg-pomodoro-long'
-                      } ${isRunning ? 'opacity-100' : 'opacity-40'}`}
-                      initial={false}
-                      animate={{ width: `${progress}%` }}
-                      transition={{ duration: 0.5, ease: 'linear' }}
-                    />
-                  </div>
-                </button>
-              );
-            })}
-          </motion.div>
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => handleModeSwitch(tab.key)}
+                    className={`relative px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 min-h-[44px] flex flex-col items-center justify-center gap-0.5 ${
+                      mode === tab.key
+                        ? 'text-foreground'
+                        : 'text-muted-foreground hover:text-foreground/70'
+                    }`}
+                  >
+                    {mode === tab.key && (
+                      <motion.div
+                        layoutId="activeTab"
+                        className={`absolute inset-0 rounded-lg border ${getAccentBg(tab.key)}`}
+                        transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
+                      />
+                    )}
+                    <span className="relative z-10">{tab.label}</span>
+                    
+                    {/* Progress Indicator Bar */}
+                    <div className="relative z-10 w-8 h-0.5 mt-0.5 rounded-full bg-muted overflow-hidden">
+                      <motion.div 
+                        className={`h-full ${
+                          tab.key === 'work' ? 'bg-pomodoro-work' : 
+                          tab.key === 'shortBreak' ? 'bg-pomodoro-short' : 
+                          'bg-pomodoro-long'
+                        } ${isRunning ? 'opacity-100' : 'opacity-40'}`}
+                        initial={false}
+                        animate={{ width: `${progress}%` }}
+                        transition={{ duration: 0.5, ease: 'linear' }}
+                      />
+                    </div>
+                  </button>
+                );
+              })}
+            </motion.div>
+          </div>
         </div>
       </div>
 
