@@ -185,17 +185,14 @@ export function notifyTimerComplete(type: 'work' | 'shortBreak' | 'longBreak') {
 
   const msg = messages[type];
   
-  // 1. Always show local notification in foreground/main thread
+  // 1. Show local notification (main thread)
   sendLocalNotification(msg.title, msg.body);
 
-  // 2. Only signal service worker if app is in background
-  // This avoids double notifications when app is active
-  if (typeof document !== 'undefined' && document.visibilityState === 'hidden') {
-    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-      navigator.serviceWorker.controller.postMessage({
-        type: 'TIMER_COMPLETE',
-        notificationType: type,
-      });
-    }
+  // 2. Signal service worker (for background/lock screen)
+  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage({
+      type: 'TIMER_COMPLETE',
+      notificationType: type,
+    });
   }
 }

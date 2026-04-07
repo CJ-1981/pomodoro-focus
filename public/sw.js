@@ -110,22 +110,33 @@ self.addEventListener('message', (event) => {
   if (event.data.type === 'FIREBASE_CONFIG') {
     initFirebase(event.data.config);
   } else if (event.data.type === 'TIMER_COMPLETE') {
-    // Local signal for background notification when app is hidden but alive
-    const type = event.data.notificationType;
-    const messages = {
-      work: { title: '🍅 Work Session Complete!', body: 'Great job! Time for a break.' },
-      shortBreak: { title: '☕ Break is Over!', body: 'Ready to focus again?' },
-      longBreak: { title: '🎉 Long Break Over!', body: "Let's get back to work!" },
-    };
-    const msg = messages[type] || messages.work;
-    self.registration.showNotification(msg.title, {
-      body: msg.body,
-      icon: './icons/icon-192.png',
-      badge: './icons/icon-192.png',
-      tag: 'pomodoro',
-      vibrate: [200, 100, 200, 100, 200, 100, 200],
-      requireInteraction: true,
-    });
+    // Only show notification if no window is focused
+    event.waitUntil(
+      self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+        const isFocused = clients.some(c => c.focused);
+        if (isFocused) {
+          console.log('[SW] App is focused, skipping SW notification to avoid double.');
+          return;
+        }
+
+        const type = event.data.notificationType;
+        const messages = {
+          work: { title: '🍅 Work Session Complete!', body: 'Great job! Time for a break.' },
+          shortBreak: { title: '☕ Break is Over!', body: 'Ready to focus again?' },
+          longBreak: { title: '🎉 Long Break Over!', body: "Let's get back to work!" },
+        };
+        const msg = messages[type] || messages.work;
+
+        return self.registration.showNotification(msg.title, {
+          body: msg.body,
+          icon: './icons/icon-192.png',
+          badge: './icons/icon-192.png',
+          tag: 'pomodoro',
+          vibrate: [200, 100, 200, 100, 200, 100, 200],
+          requireInteraction: true,
+        });
+      })
+    );
   }
 });
 
