@@ -121,7 +121,6 @@ export function PomodoroApp() {
   // Combined Service Worker & FCM initialization
   useEffect(() => {
     if (!_hasHydrated || fcmInitRef.current) return;
-    fcmInitRef.current = true;
 
     async function setupServiceWorker() {
       if (!('serviceWorker' in navigator)) return;
@@ -129,15 +128,28 @@ export function PomodoroApp() {
       try {
         const registration = await navigator.serviceWorker.register('./sw.js');
         logger.log('Service Worker registered:', registration.scope);
+        
+        // Mark as initiated only if registration succeeded
+        fcmInitRef.current = true;
 
         // Auto-reconnect FCM if configured
         const isConfigured =
           !!firebaseConfig.apiKey && !!firebaseConfig.projectId && !!firebaseConfig.vapidKey;
         
         if (isConfigured && fcmStatus === 'disconnected') {
-          // Small delay to let SW settle
-          await new Promise(r => setTimeout(r, 1000));
+          // Wait for service worker to be ready and controlled
+          await navigator.serviceWorker.ready;
           
+          // If no controller, we might need to wait or reload (but let's try waiting)
+          if (!navigator.serviceWorker.controller) {
+            logger.log('[PomodoroApp] SW controller not ready, waiting...');
+            await new Promise<void>((resolve) => {
+              navigator.serviceWorker.addEventListener('controllerchange', () => resolve(), { once: true });
+              // Safety timeout
+              setTimeout(resolve, 3000);
+            });
+          }
+
           logger.log('[PomodoroApp] Auto-reconnecting FCM...');
           setFcmStatus('connecting');
           
@@ -152,6 +164,7 @@ export function PomodoroApp() {
         }
       } catch (error) {
         logger.log('Service Worker registration failed:', error);
+        // Don't set fcmInitRef.current = true here, allowing retry on next render
       }
     }
 
